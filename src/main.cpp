@@ -2,6 +2,16 @@
 #include <raymath.h>
 #include <vector>
 
+#define GRID_WIDTH 2
+#define GRID_HEIGHT 10
+
+class Position {
+    public:
+        int x;
+        int y;
+        Position(int _x, int _y): x(_x), y(_y) {}
+};
+
 class Timer {
     private:
         double startTime;
@@ -28,27 +38,31 @@ class BoardCell {
 };
 
 int main(void) { 
-    InitWindow(100, 250, "Template-4.0.0");
+    InitWindow(50, 250, "Template-4.0.0");
     Timer timer;
     SetTargetFPS(60);
-    int pos = 0;
-    std::vector<BoardCell> board(10, BoardCell(BLANK, true));
+    Position pos(0, 0);
+
+    std::vector<std::vector<BoardCell>> grid;
+    for (int i = 0; i < GRID_WIDTH; i++) {
+        grid.push_back(std::vector<BoardCell>(GRID_HEIGHT, BoardCell(BLANK, true)));
+    }
 
     while (!WindowShouldClose()) {
         if (timer.getElapsed() > 1) {
-            if (pos == 9) {
-                board[pos] = BoardCell(RED, false);
-                pos = 0;
+            if (pos.y == 9) {
+                grid[pos.x][pos.y] = BoardCell(RED, false);
+                pos.y = 0;
             }
-            else if (board[pos + 1].isEmpty) {
-                pos++;
+            else if (grid[pos.x][pos.y + 1].isEmpty) {
+                pos.y++;
             }
-            else if (!board[pos].isEmpty) {
+            else if (!grid[pos.x][pos.y].isEmpty) {
                 // game over
             }
             else {
-                board[pos] = BoardCell(RED, false);
-                pos = 0;
+                grid[pos.x][pos.y] = BoardCell(RED, false);
+                pos.y = 0;
             }
 
             timer.start();
@@ -56,14 +70,16 @@ int main(void) {
 
         BeginDrawing();
             ClearBackground(RAYWHITE);
-            DrawRectangle(0, 25 * pos, 25, 25, RED);
-            DrawRectangleLines(0, 25 * pos, 25, 25, BLACK);
+            DrawRectangle(pos.x * 25, 25 * pos.y, 25, 25, RED);
+            DrawRectangleLines(pos.x * 25, 25 * pos.y, 25, 25, BLACK);
 
-            for (int i = 0; i < 10; i++) {
-                BoardCell cell = board[i];
-                if (!cell.isEmpty) {
-                    DrawRectangle(0, 25 * i, 25, 25, RED);
-                    DrawRectangleLines(0, 25 * i, 25, 25, BLACK);
+            for (int x = 0; x < GRID_WIDTH; x++) {
+                for (int y = 0; y < GRID_HEIGHT; y++) {
+                    BoardCell cell = grid[x][y];
+                    if (!cell.isEmpty) {
+                        DrawRectangle(25 * x, 25 * y, 25, 25, RED);
+                        DrawRectangleLines(25 * x, 25 * y, 25, 25, BLACK);
+                    }
                 }
             }
         EndDrawing();
