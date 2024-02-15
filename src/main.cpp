@@ -2,7 +2,7 @@
 #include <raymath.h>
 #include <vector>
 
-#define GRID_WIDTH 2
+#define GRID_WIDTH 5
 #define GRID_HEIGHT 10
 
 class Position {
@@ -57,13 +57,13 @@ class GameGrid {
         }
 
         bool checkCollision(Position p) {
-            if (!this->isEmpty(p)) {
-                return true;
-            }
             if (p.x < 0 or p.x >= GRID_WIDTH) {
                 return true;
             }
             if (p.y >= GRID_HEIGHT) {
+                return true;
+            }
+            if (!this->isEmpty(p)) {
                 return true;
             }
             return false;
@@ -79,13 +79,38 @@ class GameGrid {
 };
 
 int main(void) { 
-    InitWindow(50, 250, "Template-4.0.0");
+    InitWindow(250, 250, "Template-4.0.0");
     Timer timer;
+    Timer speedLimiter;
     SetTargetFPS(60);
     Position pos(0, 0);
     GameGrid grid;
 
     while (!WindowShouldClose()) {
+        // player input
+        if (IsKeyPressed(KEY_RIGHT)) {
+            Position newPos(pos.x+1, pos.y);
+            if (!grid.checkCollision(newPos)) {
+                pos = newPos;
+            }
+        }
+        if (IsKeyPressed(KEY_LEFT)) {
+            Position newPos(pos.x-1, pos.y);
+            if (!grid.checkCollision(newPos)) {
+                pos = newPos;
+            }
+        }
+        if (IsKeyDown(KEY_DOWN) and speedLimiter.getElapsed() > 0.05) {
+            Position newPos(pos.x, pos.y + 1);
+            if (!grid.checkCollision(newPos)) {
+                pos = newPos;
+            }
+            speedLimiter.start();
+            timer.start();
+        }
+
+
+        // moved piece down one postition after time elapsed
         if (timer.getElapsed() > 1) {
             Position newPos(pos.x, pos.y + 1);
 
