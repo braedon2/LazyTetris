@@ -3,9 +3,13 @@
 #include <vector>
 #include <iostream>
 
-#define GRID_WIDTH 5
-#define GRID_HEIGHT 10
-#define BLOCK_SIZE 15
+namespace {
+    int GRID_WIDTH = 10;
+    int GRID_HEIGHT = 20;
+    int BLOCK_SIZE = 15;
+    int WINDOW_WIDTH = GRID_WIDTH * BLOCK_SIZE;
+    int WINDOW_HEIGHT = GRID_HEIGHT * BLOCK_SIZE;
+}
 
 class Position {
     public:
@@ -81,7 +85,7 @@ class GameGrid {
 };
 
 int main(void) { 
-    InitWindow(250, 250, "Template-4.0.0");
+    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tetris");
     Timer timer;
     Timer speedLimiter;
     SetTargetFPS(60);
