@@ -1,9 +1,11 @@
 #include <raylib.h>
 #include <raymath.h>
 #include <vector>
+#include <iostream>
 
 #define GRID_WIDTH 5
 #define GRID_HEIGHT 10
+#define BLOCK_SIZE 15
 
 class Position {
     public:
@@ -102,11 +104,11 @@ int main(void) {
         }
         if (IsKeyDown(KEY_DOWN) and speedLimiter.getElapsed() > 0.05) {
             Position newPos(pos.x, pos.y + 1);
-            if (!grid.checkCollision(newPos)) {
+            if (not grid.checkCollision(newPos)) {
                 pos = newPos;
+                timer.start();
             }
             speedLimiter.start();
-            timer.start();
         }
 
 
@@ -116,7 +118,7 @@ int main(void) {
 
             if (grid.checkCollision(pos)) {
                 // game over
-                continue;
+                break;
             }
             // active piece moving down would cause a position
             // place it at its current position and start a new active piece
@@ -135,15 +137,15 @@ int main(void) {
 
         BeginDrawing();
             ClearBackground(RAYWHITE);
-            DrawRectangle(pos.x * 25, 25 * pos.y, 25, 25, RED);
-            DrawRectangleLines(pos.x * 25, 25 * pos.y, 25, 25, BLACK);
+            DrawRectangle(pos.x * BLOCK_SIZE, BLOCK_SIZE * pos.y, BLOCK_SIZE, BLOCK_SIZE, RED);
+            DrawRectangleLines(pos.x * BLOCK_SIZE, BLOCK_SIZE * pos.y, BLOCK_SIZE, BLOCK_SIZE, BLACK);
 
             for (int x = 0; x < GRID_WIDTH; x++) {
                 for (int y = 0; y < GRID_HEIGHT; y++) {
                     Position p(x, y);
                     if (!grid.isEmpty(p)) {
-                        DrawRectangle(25 * x, 25 * y, 25, 25, grid.getColor(p));
-                        DrawRectangleLines(25 * x, 25 * y, 25, 25, BLACK);
+                        DrawRectangle(BLOCK_SIZE * x, BLOCK_SIZE * y, BLOCK_SIZE, BLOCK_SIZE, grid.getColor(p));
+                        DrawRectangleLines(BLOCK_SIZE * x, BLOCK_SIZE * y, BLOCK_SIZE, BLOCK_SIZE, BLACK);
                     }
                 }
             }
