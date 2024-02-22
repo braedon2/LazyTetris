@@ -1,5 +1,11 @@
 #include <raylib.h>
 
+enum Direction {
+    down,
+    right,
+    left
+};
+
 class Position {
     public:
         int x;

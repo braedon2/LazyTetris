@@ -62,14 +62,44 @@ class GameGrid {
     }
 };
 
-// class GameState {
-//     private:
-//     GameGrid grid;
-//     Position currentPie
+class GameState {
+    private:
+    GameGrid grid;
+    Position currentTetronimo = Position(0, 0);
 
-//     public:
+    public:
+    void initNewTetronimo() { this->currentTetronimo = Position(0, 0); }
 
-// };
+    // Moves the current tetromino one cell in the given direction so long as it does not cause a 
+    // collision with the grid bounds or a placed tetrominoes.
+    // Left/right movements are ignored if they would cause a collision
+    // A down movement that results in a collision causes the current tetromino to be placed in the 
+    // grid and a new tetromino to be initialized
+    void moveTetronimo(Direction direction) {
+        if (direction == down) {
+            Position tmpTetronimo(this->currentTetronimo.x, this->currentTetronimo.y + 1);
+            if (this->grid.checkCollision(tmpTetronimo)) {
+                this->grid.setCell(this->currentTetronimo, RED);
+                this->initNewTetronimo();
+            }
+            else {
+                this->currentTetronimo = tmpTetronimo;
+            }
+        }
+        else if (direction == right) {
+            Position tmpTetronimo(this->currentTetronimo.x + 1, this->currentTetronimo.y);
+            if (not this->grid.checkCollision(tmpTetronimo)) {
+                this->currentTetronimo = tmpTetronimo;
+            }
+        }
+        else if (direction == left) {
+            Position tmpTetronimo(this->currentTetronimo.x - 1, this->currentTetronimo.y);
+            if (not this->grid.checkCollision(tmpTetronimo)) {
+                this->currentTetronimo = tmpTetronimo;
+            }
+        }
+    }
+};
 
 int main(void) { 
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tetris");
@@ -78,6 +108,7 @@ int main(void) {
     SetTargetFPS(60);
     Position pos(0, 0);
     GameGrid grid;
+    GameState state;
 
     while (!WindowShouldClose()) {
         // player input
