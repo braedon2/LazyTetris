@@ -3,6 +3,8 @@
 #include <vector>
 #include <iostream>
 
+#include "util.h"
+
 namespace {
     int GRID_WIDTH = 10;
     int GRID_HEIGHT = 20;
@@ -10,30 +12,6 @@ namespace {
     int WINDOW_WIDTH = GRID_WIDTH * BLOCK_SIZE;
     int WINDOW_HEIGHT = GRID_HEIGHT * BLOCK_SIZE;
 }
-
-class Position {
-    public:
-        int x;
-        int y;
-        Position(int _x, int _y): x(_x), y(_y) {}
-};
-
-class Timer {
-    private:
-        double startTime;
-    public:
-        Timer() {
-            this->startTime = GetTime();
-        }
-
-        void start() {
-            this->startTime = GetTime();
-        }
-
-        double getElapsed() {
-            return GetTime() - this->startTime;
-        }
-};
 
 class GridBlock {
     public:
