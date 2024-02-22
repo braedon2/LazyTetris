@@ -70,6 +70,10 @@ class GameState {
     public:
     void initNewTetronimo() { this->currentTetronimo = Position(0, 0); }
 
+    GameGrid getGrid() { return this->grid; }
+
+    Position getCurrentTetronimo() { return this->currentTetronimo; }
+
     // Moves the current tetromino one cell in the given direction so long as it does not cause a 
     // collision with the grid bounds or a placed tetrominoes.
     // Left/right movements are ignored if they would cause a collision
@@ -106,62 +110,33 @@ int main(void) {
     Timer timer;
     Timer speedLimiter;
     SetTargetFPS(60);
-    Position pos(0, 0);
-    GameGrid grid;
     GameState state;
 
     while (!WindowShouldClose()) {
-        // player input
         if (IsKeyPressed(KEY_RIGHT)) {
-            Position newPos(pos.x+1, pos.y);
-            if (!grid.checkCollision(newPos)) {
-                pos = newPos;
-            }
+            state.moveTetronimo(right);
         }
         if (IsKeyPressed(KEY_LEFT)) {
-            Position newPos(pos.x-1, pos.y);
-            if (!grid.checkCollision(newPos)) {
-                pos = newPos;
-            }
+            state.moveTetronimo(left);
         }
         if (IsKeyDown(KEY_DOWN) and speedLimiter.getElapsed() > 0.05) {
-            Position newPos(pos.x, pos.y + 1);
-            if (not grid.checkCollision(newPos)) {
-                pos = newPos;
-                timer.start();
-            }
+            state.moveTetronimo(down);
+            timer.start();
             speedLimiter.start();
         }
 
-
-        // moved piece down one postition after time elapsed
         if (timer.getElapsed() > 1) {
-            Position newPos(pos.x, pos.y + 1);
-
-            if (grid.checkCollision(pos)) {
-                // game over
-                break;
-            }
-            // active piece moving down would cause a position
-            // place it at its current position and start a new active piece
-            if (grid.checkCollision(newPos)) {
-                grid.setCell(pos, RED);
-                pos = Position(0, 0);
-            }
-            // moving the active piece down does not cause a collision
-            // so set its current position to the new position
-            else {
-                pos = newPos;
-            }
-
+            state.moveTetronimo(down);
             timer.start();
         }
 
         BeginDrawing();
+            Position pos = state.getCurrentTetronimo();
             ClearBackground(RAYWHITE);
             DrawRectangle(pos.x * BLOCK_SIZE, BLOCK_SIZE * pos.y, BLOCK_SIZE, BLOCK_SIZE, RED);
             DrawRectangleLines(pos.x * BLOCK_SIZE, BLOCK_SIZE * pos.y, BLOCK_SIZE, BLOCK_SIZE, BLACK);
 
+            GameGrid grid = state.getGrid();
             for (int x = 0; x < GRID_WIDTH; x++) {
                 for (int y = 0; y < GRID_HEIGHT; y++) {
                     Position p(x, y);

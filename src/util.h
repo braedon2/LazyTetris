@@ -17,15 +17,9 @@ class Timer {
     private:
         double startTime;
     public:
-        Timer() {
-            this->startTime = GetTime();
-        }
+        Timer() { this->startTime = GetTime(); }
 
-        void start() {
-            this->startTime = GetTime();
-        }
+        void start() { this->startTime = GetTime(); }
 
-        double getElapsed() {
-            return GetTime() - this->startTime;
-        }
+        double getElapsed() { return GetTime() - this->startTime; }
 };
