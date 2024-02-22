@@ -13,54 +13,63 @@ namespace {
     int WINDOW_HEIGHT = GRID_HEIGHT * BLOCK_SIZE;
 }
 
-class GridBlock {
+class GridCell {
     public:
-        Color color;
-        bool isEmpty;
+    Color color;
+    bool isEmpty;
 
-        GridBlock(Color _color, bool _isEmpty): color(_color), isEmpty(_isEmpty) {}
+    GridCell(Color _color, bool _isEmpty): color(_color), isEmpty(_isEmpty) {}
 };
 
 class GameGrid {
     private:
-        std::vector<std::vector<GridBlock>> grid;
+    std::vector<std::vector<GridCell>> grid;
     
     public:
-        GameGrid() {
-            for (int i = 0; i < GRID_WIDTH; i++) {
-                grid.push_back(std::vector<GridBlock>(GRID_HEIGHT, GridBlock(BLANK, true)));
-            }
+    GameGrid() {
+        for (int i = 0; i < GRID_WIDTH; i++) {
+            grid.push_back(std::vector<GridCell>(GRID_HEIGHT, GridCell(BLANK, true)));
         }
+    }
 
-        bool isEmpty(Position p) {
-            return this->grid[p.x][p.y].isEmpty;
-        }
+    bool isEmpty(Position p) {
+        return this->grid[p.x][p.y].isEmpty;
+    }
 
-        Color getColor(Position p) {
-            return this->grid[p.x][p.y].color;
-        }
+    Color getColor(Position p) {
+        return this->grid[p.x][p.y].color;
+    }
 
-        bool checkCollision(Position p) {
-            if (p.x < 0 or p.x >= GRID_WIDTH) {
-                return true;
-            }
-            if (p.y >= GRID_HEIGHT) {
-                return true;
-            }
-            if (!this->isEmpty(p)) {
-                return true;
-            }
-            return false;
+    bool checkCollision(Position p) {
+        if (p.x < 0 or p.x >= GRID_WIDTH) {
+            return true;
         }
+        if (p.y >= GRID_HEIGHT) {
+            return true;
+        }
+        if (!this->isEmpty(p)) {
+            return true;
+        }
+        return false;
+    }
 
-        void setBlock(Position p, Color color) {
-            this->grid[p.x][p.y] = GridBlock(color, false);
-        }
+    void setCell(Position p, Color color) {
+        this->grid[p.x][p.y] = GridCell(color, false);
+    }
 
-        void clearBlock(Position p) {
-            this->grid[p.x][p.y] = GridBlock(BLANK, true);
-        }
+    void clearCell(Position p) {
+        this->grid[p.x][p.y] = GridCell(BLANK, true);
+    }
 };
+
+// class GameState {
+//     private:
+//     GameGrid grid;
+//     Position currentPie
+
+//     public:
+
+// };
 
 int main(void) { 
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tetris");
@@ -105,7 +114,7 @@ int main(void) {
             // active piece moving down would cause a position
             // place it at its current position and start a new active piece
             if (grid.checkCollision(newPos)) {
-                grid.setBlock(pos, RED);
+                grid.setCell(pos, RED);
                 pos = Position(0, 0);
             }
             // moving the active piece down does not cause a collision
