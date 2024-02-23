@@ -66,25 +66,35 @@ class GameState {
     private:
     GameGrid grid;
     Position currentTetronimo = Position(0, 0);
+    bool isCurrentTetronimoPlaced = false;
 
     public:
-    void initNewTetronimo() { this->currentTetronimo = Position(0, 0); }
+    void initNewTetronimo() { 
+        this->currentTetronimo = Position(0, 0); 
+        this->isCurrentTetronimoPlaced = false;
+    }
 
     GameGrid getGrid() { return this->grid; }
 
     Position getCurrentTetronimo() { return this->currentTetronimo; }
 
+    bool isCurrentTetrominoPlaced() { return this->isCurrentTetronimoPlaced; }
+
     // Moves the current tetromino one cell in the given direction so long as it does not cause a 
-    // collision with the grid bounds or a placed tetrominoes.
+    // collision with the grid bounds or placed tetrominoes.
     // Left/right movements are ignored if they would cause a collision
-    // A down movement that results in a collision causes the current tetromino to be placed in the 
-    // grid and a new tetromino to be initialized
+    // A down movement that results in a collision causes the current tetromino to be placed where it 
+    // is in the grid and a new tetromino to be initialized
     void moveTetronimo(Direction direction) {
+        if (this->isCurrentTetronimoPlaced) {
+            return;
+        }
+
         if (direction == down) {
             Position tmpTetronimo(this->currentTetronimo.x, this->currentTetronimo.y + 1);
             if (this->grid.checkCollision(tmpTetronimo)) {
                 this->grid.setCell(this->currentTetronimo, RED);
-                this->initNewTetronimo();
+                this->isCurrentTetronimoPlaced = true;
             }
             else {
                 this->currentTetronimo = tmpTetronimo;
@@ -111,6 +121,7 @@ int main(void) {
     Timer speedLimiter;
     SetTargetFPS(60);
     GameState state;
+    bool disableKeyDown = false;
 
     while (!WindowShouldClose()) {
         if (IsKeyPressed(KEY_RIGHT)) {
@@ -119,10 +130,16 @@ int main(void) {
         if (IsKeyPressed(KEY_LEFT)) {
             state.moveTetronimo(left);
         }
-        if (IsKeyDown(KEY_DOWN) and speedLimiter.getElapsed() > 0.05) {
+        if (IsKeyDown(KEY_DOWN) and speedLimiter.getElapsed() > 0.05 and not disableKeyDown) {
             state.moveTetronimo(down);
             timer.start();
             speedLimiter.start();
+        }
+        if (IsKeyDown(KEY_DOWN) and state.isCurrentTetrominoPlaced()) {
+            disableKeyDown = true;
+        }
+        if (IsKeyReleased(KEY_DOWN) and disableKeyDown) {
+            disableKeyDown = false;
         }
 
         if (timer.getElapsed() > 1) {
@@ -147,6 +164,11 @@ int main(void) {
                 }
             }
         EndDrawing();
+
+        if (state.isCurrentTetrominoPlaced() and timer.getElapsed() > 0.5) {
+            state.initNewTetronimo();
+            timer.start();
+        }
     }
     
     CloseWindow();
