@@ -1,3 +1,6 @@
+#ifndef UTIL_H
+#define UTIL_H
+
 #include <raylib.h>
 
 enum Direction {
@@ -23,3 +26,5 @@ class Timer {
 
         double getElapsed() { return GetTime() - this->startTime; }
 };
+
+#endif

@@ -1,125 +1,19 @@
-#include <raylib.h>
-#include <raymath.h>
 #include <vector>
 #include <iostream>
 
+#include <raylib.h>
+#include <raymath.h>
+
 #include "util.h"
-
-namespace {
-    int GRID_WIDTH = 10;
-    int GRID_HEIGHT = 20;
-    int BLOCK_SIZE = 15;
-    int WINDOW_WIDTH = GRID_WIDTH * BLOCK_SIZE;
-    int WINDOW_HEIGHT = GRID_HEIGHT * BLOCK_SIZE;
-}
-
-class GridCell {
-    public:
-    Color color;
-    bool isEmpty;
-
-    GridCell(Color _color, bool _isEmpty): color(_color), isEmpty(_isEmpty) {}
-};
-
-class GameGrid {
-    private:
-    std::vector<std::vector<GridCell>> grid;
-    
-    public:
-    GameGrid() {
-        for (int i = 0; i < GRID_WIDTH; i++) {
-            grid.push_back(std::vector<GridCell>(GRID_HEIGHT, GridCell(BLANK, true)));
-        }
-    }
-
-    bool isEmpty(Position p) {
-        return this->grid[p.x][p.y].isEmpty;
-    }
-
-    Color getColor(Position p) {
-        return this->grid[p.x][p.y].color;
-    }
-
-    bool checkCollision(Position p) {
-        if (p.x < 0 or p.x >= GRID_WIDTH) {
-            return true;
-        }
-        if (p.y >= GRID_HEIGHT) {
-            return true;
-        }
-        if (!this->isEmpty(p)) {
-            return true;
-        }
-        return false;
-    }
-
-    void setCell(Position p, Color color) {
-        this->grid[p.x][p.y] = GridCell(color, false);
-    }
-
-    void clearCell(Position p) {
-        this->grid[p.x][p.y] = GridCell(BLANK, true);
-    }
-};
-
-class GameState {
-    private:
-    GameGrid grid;
-    Position currentTetronimo = Position(0, 0);
-    bool isCurrentTetronimoPlaced = false;
-
-    public:
-    void initNewTetronimo() { 
-        this->currentTetronimo = Position(0, 0); 
-        this->isCurrentTetronimoPlaced = false;
-    }
-
-    GameGrid getGrid() { return this->grid; }
-
-    Position getCurrentTetronimo() { return this->currentTetronimo; }
-
-    bool isCurrentTetrominoPlaced() { return this->isCurrentTetronimoPlaced; }
-
-    // Moves the current tetromino one cell in the given direction so long as it does not cause a 
-    // collision with the grid bounds or placed tetrominoes.
-    // Left/right movements are ignored if they would cause a collision
-    // A down movement that results in a collision causes the current tetromino to be placed where it 
-    // is in the grid and a new tetromino to be initialized
-    void moveTetronimo(Direction direction) {
-        if (this->isCurrentTetronimoPlaced) {
-            return;
-        }
-
-        if (direction == down) {
-            Position tmpTetronimo(this->currentTetronimo.x, this->currentTetronimo.y + 1);
-            if (this->grid.checkCollision(tmpTetronimo)) {
-                this->grid.setCell(this->currentTetronimo, RED);
-                this->isCurrentTetronimoPlaced = true;
-            }
-            else {
-                this->currentTetronimo = tmpTetronimo;
-            }
-        }
-        else if (direction == right) {
-            Position tmpTetronimo(this->currentTetronimo.x + 1, this->currentTetronimo.y);
-            if (not this->grid.checkCollision(tmpTetronimo)) {
-                this->currentTetronimo = tmpTetronimo;
-            }
-        }
-        else if (direction == left) {
-            Position tmpTetronimo(this->currentTetronimo.x - 1, this->currentTetronimo.y);
-            if (not this->grid.checkCollision(tmpTetronimo)) {
-                this->currentTetronimo = tmpTetronimo;
-            }
-        }
-    }
-};
+#include "constants.h"
+#include "tetris.h"
 
 int main(void) { 
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tetris");
+    SetTargetFPS(60);
+
     Timer timer;
     Timer speedLimiter;
-    SetTargetFPS(60);
     GameState state;
     bool disableKeyDown = false;
 
@@ -147,6 +41,12 @@ int main(void) {
             timer.start();
         }
 
+        // check for rows to clear
+
+        // animate clearing rows
+
+        // remove rows and shift down
+
         BeginDrawing();
             Position pos = state.getCurrentTetronimo();
             ClearBackground(RAYWHITE);
@@ -172,6 +72,5 @@ int main(void) {
     }
     
     CloseWindow();
-    
     return 0;
 }
