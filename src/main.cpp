@@ -39,30 +39,22 @@ int main(void) {
         if (timer.getElapsed() > 1) {
             state.moveTetronimo(down);
             timer.start();
-        }
 
-        // check for rows to clear
-        if (state.isCurrentTetrominoPlaced()) {
-            std::cout << "checking rows to clear..." << std::endl;
-            auto rows = state.getRowsToClear();
-            if (not rows.empty()) {
-                std::cout << "full rows: ";
-                for (auto r : rows) {
-                    std::cout << r << ' ';
-                }
-                std::cout << std::endl;
+            // check for rows to clear
+            if (state.isCurrentTetrominoPlaced()) {
+                auto rows = state.clearFullRows();
+
+                // animate clearing rows
             }
-
-            // animate clearing rows
-
-            // remove rows and shift down
         }
 
         BeginDrawing();
             Position pos = state.getCurrentTetronimo();
             ClearBackground(RAYWHITE);
-            DrawRectangle(pos.x * BLOCK_SIZE, BLOCK_SIZE * pos.y, BLOCK_SIZE, BLOCK_SIZE, RED);
-            DrawRectangleLines(pos.x * BLOCK_SIZE, BLOCK_SIZE * pos.y, BLOCK_SIZE, BLOCK_SIZE, BLACK);
+            if (not state.isCurrentTetrominoPlaced()) {
+                DrawRectangle(pos.x * BLOCK_SIZE, BLOCK_SIZE * pos.y, BLOCK_SIZE, BLOCK_SIZE, RED);
+                DrawRectangleLines(pos.x * BLOCK_SIZE, BLOCK_SIZE * pos.y, BLOCK_SIZE, BLOCK_SIZE, BLACK);
+            }
 
             GameGrid grid = state.getGrid();
             for (int x = 0; x < GRID_WIDTH; x++) {

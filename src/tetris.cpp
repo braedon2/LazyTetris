@@ -56,6 +56,17 @@ std::vector<int> GameGrid::getFullRows() {
     return fullRows;
 }
 
+void GameGrid::clearRows(std::vector<int> row_indices) {
+    // for each cleared row, delete the row then insert an empty row at the beginning of the list
+    // so all the rows above it appear to shift down one level in the grid
+    for (int i : row_indices) {
+        this->grid.erase(this->grid.begin() + i);
+        this->grid.insert(
+            this->grid.begin(), 
+            std::vector<GridCell>(GRID_WIDTH, GridCell(BLANK, true)));
+    }
+}
+
 /***********
  * GameState
  ***********/
@@ -63,7 +74,12 @@ std::vector<int> GameGrid::getFullRows() {
 GameGrid GameState::getGrid() { return this->grid; }
 Position GameState::getCurrentTetronimo() { return this->currentTetronimo; }
 bool GameState::isCurrentTetrominoPlaced() { return this->isCurrentTetronimoPlaced; }
-std::vector<int> GameState::getRowsToClear() { return this->grid.getFullRows(); }
+
+std::vector<int> GameState::clearFullRows() { 
+    auto rows_cleared = this->grid.getFullRows(); 
+    this->grid.clearRows(rows_cleared);
+    return rows_cleared;
+}
 
 void GameState::initNewTetronimo() { 
     this->currentTetronimo = Position(0, 0); 

@@ -25,6 +25,7 @@ class GameGrid {
     void clearCell(Position p);
     bool checkCollision(Position p);
     std::vector<int> getFullRows();
+    void clearRows(std::vector<int> row_indexes);
 };
 
 class GameState {
@@ -44,7 +45,7 @@ class GameState {
     GameGrid getGrid();
     Position getCurrentTetronimo();
     bool isCurrentTetrominoPlaced();
-    std::vector<int> getRowsToClear();
+    std::vector<int> clearFullRows(); // returns indices of full rows that were cleared
     void initNewTetronimo();
 
     // Moves the current tetromino one cell in the given direction so long as it does not cause a 
