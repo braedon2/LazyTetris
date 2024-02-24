@@ -2,8 +2,8 @@
     "tasks": [
         {
             "type": "shell",
-            "label": "build osx",
-            "command": "make build_osx",
+            "label": "build osx debug",
+            "command": "make build_osx_debug",
             "options": {
                 "cwd": "${workspaceFolder}"
             },

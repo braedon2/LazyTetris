@@ -14,6 +14,7 @@ class GridCell {
 
 class GameGrid {
     private:
+    // first dimension is row, second dimension is column
     std::vector<std::vector<GridCell>> grid;
 
     public:
@@ -23,18 +24,27 @@ class GameGrid {
     void setCell(Position p, Color color);
     void clearCell(Position p);
     bool checkCollision(Position p);
+    std::vector<int> getFullRows();
 };
 
 class GameState {
     private:
+    // Keeps track of the fallen tetrominos that can no longer be moved. This usually does not
+    // include the current tetromino
     GameGrid grid;
     Position currentTetronimo = Position(0, 0);
+
+    // Flag keeps track of if the current tetromino has been placed in the grid. 
+    // Flag is set by moveTetronimo member function when the current tetronimo can no longer move
+    // down and is placed in the grid.
+    // Flag is unset when initNewTetronimo is called.
     bool isCurrentTetronimoPlaced = false;
 
     public:
     GameGrid getGrid();
     Position getCurrentTetronimo();
     bool isCurrentTetrominoPlaced();
+    std::vector<int> getRowsToClear();
     void initNewTetronimo();
 
     // Moves the current tetromino one cell in the given direction so long as it does not cause a 

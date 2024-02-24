@@ -10,7 +10,7 @@
 
 int main(void) { 
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tetris");
-    SetTargetFPS(60);
+    SetTargetFPS(30);
 
     Timer timer;
     Timer speedLimiter;
@@ -42,10 +42,21 @@ int main(void) {
         }
 
         // check for rows to clear
+        if (state.isCurrentTetrominoPlaced()) {
+            std::cout << "checking rows to clear..." << std::endl;
+            auto rows = state.getRowsToClear();
+            if (not rows.empty()) {
+                std::cout << "full rows: ";
+                for (auto r : rows) {
+                    std::cout << r << ' ';
+                }
+                std::cout << std::endl;
+            }
 
-        // animate clearing rows
+            // animate clearing rows
 
-        // remove rows and shift down
+            // remove rows and shift down
+        }
 
         BeginDrawing();
             Position pos = state.getCurrentTetronimo();

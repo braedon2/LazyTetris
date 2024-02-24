@@ -6,25 +6,25 @@
  **********/
 
 GameGrid::GameGrid() {
-    for (int i = 0; i < GRID_WIDTH; i++) {
-        grid.push_back(std::vector<GridCell>(GRID_HEIGHT, GridCell(BLANK, true)));
+    for (int i = 0; i < GRID_HEIGHT; i++) {
+        grid.push_back(std::vector<GridCell>(GRID_WIDTH, GridCell(BLANK, true)));
     }
 }
 
 bool GameGrid::isEmpty(Position p) {
-    return this->grid[p.x][p.y].isEmpty;
+    return this->grid[p.y][p.x].isEmpty;
 }
 
 Color GameGrid::getColor(Position p) {
-    return this->grid[p.x][p.y].color;
+    return this->grid[p.y][p.x].color;
 }
 
 void GameGrid::setCell(Position p, Color color) {
-    this->grid[p.x][p.y] = GridCell(color, false);
+    this->grid[p.y][p.x] = GridCell(color, false);
 }
 
 void GameGrid::clearCell(Position p) {
-    this->grid[p.x][p.y] = GridCell(BLANK, true);
+    this->grid[p.y][p.x] = GridCell(BLANK, true);
 }
 
 bool GameGrid::checkCollision(Position p) {
@@ -40,6 +40,22 @@ bool GameGrid::checkCollision(Position p) {
     return false;
 }
 
+std::vector<int> GameGrid::getFullRows() {
+    std::vector<int> fullRows;
+    int currentRow = 0;
+    for (auto row : this->grid) {
+        bool foundEmptyCell = false;
+        for (auto cell : row) {
+            foundEmptyCell = foundEmptyCell or cell.isEmpty;
+        }
+        if (not foundEmptyCell) {
+            fullRows.push_back(currentRow);
+        }
+        currentRow++;
+    }
+    return fullRows;
+}
+
 /***********
  * GameState
  ***********/
@@ -47,6 +63,7 @@ bool GameGrid::checkCollision(Position p) {
 GameGrid GameState::getGrid() { return this->grid; }
 Position GameState::getCurrentTetronimo() { return this->currentTetronimo; }
 bool GameState::isCurrentTetrominoPlaced() { return this->isCurrentTetronimoPlaced; }
+std::vector<int> GameState::getRowsToClear() { return this->grid.getFullRows(); }
 
 void GameState::initNewTetronimo() { 
     this->currentTetronimo = Position(0, 0); 
