@@ -11,12 +11,9 @@
 int main(void) { 
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tetris");
     SetTargetFPS(30); // my 2014 macbook gets too warm at 60 fps
-
-    Timer timer;
-    Timer speedLimiter;
+    
     GameState state;
     bool disableKeyDown = false;
-    std::vector<int> rowClearsToAnimate;
 
     int framesPerGridCellCounter = 0;
     int framesPerGridCell = 24; // from https://tetris.fandom.com/wiki/Tetris_(NES,_Nintendo)
@@ -26,6 +23,9 @@ int main(void) {
 
     int framesPerTetronimoResetCounter = 0;
     int framesPerTetronimoReset = 10;
+
+    int framesPerLineClearCounter = 0;
+    int framesPerLineClear = 2;
 
     while (!WindowShouldClose()) {
         framesPerGridCellCounter++;
@@ -42,12 +42,6 @@ int main(void) {
             state.moveTetronimo(down);
             framesPerGridCellCounter = 0;
             framesPerSoftDropCounter = 0;
-
-            // check for rows to clear
-            if (state.isCurrentTetrominoPlaced()) {
-                rowClearsToAnimate = state.clearFullRows();
-                std::cout << "here" << std::endl;
-            }
         }
         if (IsKeyDown(KEY_DOWN) and state.isCurrentTetrominoPlaced()) {
             disableKeyDown = true;
@@ -60,24 +54,21 @@ int main(void) {
             state.moveTetronimo(down);
             framesPerGridCellCounter = 0;
             framesPerTetronimoResetCounter = 0;
+        }
 
-            // check for rows to clear
-            if (state.isCurrentTetrominoPlaced()) {
-                rowClearsToAnimate = state.clearFullRows();
-                std::cout << "here" << std::endl;
+        if (state.isLineClearInProgress()) {
+            framesPerLineClearCounter++;
+
+            if (framesPerLineClearCounter >= framesPerLineClear) {
+                state.nextLineClearStep();
+                framesPerLineClearCounter = 0;
+            }
+
+            if (not state.isLineClearInProgress()) {
+                framesPerLineClearCounter = framesPerLineClear;
             }
         }
 
-        // if (not rowClearsToAnimate.empty()) {
-        //     for (int left_i = LEFT_MIDDLE_INDEX, right_i = RIGHT_MIDDLE_INDEX; right_i < GRID_WIDTH; left_i--, right_i++) {
-        //         BeginDrawing();
-        //             for (int row_i : rowClearsToAnimate) {
-        //                 DrawRectangle(BLOCK_SIZE * left_i, BLOCK_SIZE * row_i, BLOCK_SIZE, BLOCK_SIZE, BLANK);
-        //                 DrawRectangle(BLOCK_SIZE * right_i, BLOCK_SIZE * row_i, BLOCK_SIZE, BLOCK_SIZE, BLANK);
-        //             }
-        //         EndDrawing();
-        //     }
-        // }
 
         BeginDrawing();
             Position pos = state.getCurrentTetronimo();

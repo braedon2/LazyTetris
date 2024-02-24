@@ -33,6 +33,8 @@ class GameState {
     // Keeps track of the fallen tetrominos that can no longer be moved. This usually does not
     // include the current tetromino
     GameGrid grid;
+
+    // The falling tetromino being controlled by the player
     Position currentTetronimo = Position(0, 0);
 
     // Flag keeps track of if the current tetromino has been placed in the grid. 
@@ -41,11 +43,14 @@ class GameState {
     // Flag is unset when initNewTetronimo is called.
     bool isCurrentTetronimoPlaced = false;
 
+    // used for animating row clears
+    std::vector<int> linesToClear; // indices of rows being cleared
+    int lineClearStep = 0; 
+
     public:
     GameGrid getGrid();
     Position getCurrentTetronimo();
     bool isCurrentTetrominoPlaced();
-    std::vector<int> clearFullRows(); // returns indices of full rows that were cleared
     void initNewTetronimo();
 
     // Moves the current tetromino one cell in the given direction so long as it does not cause a 
@@ -54,6 +59,14 @@ class GameState {
     // A down movement that results in a collision causes the current tetromino to be placed where it 
     // is in the grid and a new tetromino to be initialized
     void moveTetronimo(Direction direction);
+
+    // returns true if a row clear animation is in progress. This means that rowsToClear and 
+    // rowClearStep attributes are set
+    bool isLineClearInProgress();
+
+    // Advances the row clear animation.
+    // Unsets the rowsToClear and rowClearStep attributes when the animation is finished
+    void nextLineClearStep();
 };
 
 #endif

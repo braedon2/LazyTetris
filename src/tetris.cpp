@@ -75,18 +75,13 @@ GameGrid GameState::getGrid() { return this->grid; }
 Position GameState::getCurrentTetronimo() { return this->currentTetronimo; }
 bool GameState::isCurrentTetrominoPlaced() { return this->isCurrentTetronimoPlaced; }
 
-std::vector<int> GameState::clearFullRows() { 
-    auto rows_cleared = this->grid.getFullRows(); 
-    this->grid.clearRows(rows_cleared);
-    return rows_cleared;
-}
-
 void GameState::initNewTetronimo() { 
     this->currentTetronimo = Position(0, 0); 
     this->isCurrentTetronimoPlaced = false;
 }
 
 void GameState::moveTetronimo(Direction direction) {
+    // tetromino can no longer be moved so command is ignored
     if (this->isCurrentTetronimoPlaced) {
         return;
     }
@@ -96,6 +91,7 @@ void GameState::moveTetronimo(Direction direction) {
         if (this->grid.checkCollision(tmpTetronimo)) {
             this->grid.setCell(this->currentTetronimo, RED);
             this->isCurrentTetronimoPlaced = true;
+            this->linesToClear = this->grid.getFullRows();
         }
         else {
             this->currentTetronimo = tmpTetronimo;
@@ -112,5 +108,22 @@ void GameState::moveTetronimo(Direction direction) {
         if (not this->grid.checkCollision(tmpTetronimo)) {
             this->currentTetronimo = tmpTetronimo;
         }
+    }
+}
+
+bool GameState::isLineClearInProgress() {
+    return not this->linesToClear.empty();
+}
+
+void GameState::nextLineClearStep() {
+    for (int lineIndex : this->linesToClear) {
+        this->grid.clearCell(Position(LEFT_MIDDLE_INDEX - this->lineClearStep, lineIndex));
+        this->grid.clearCell(Position(RIGHT_MIDDLE_INDEX + this->lineClearStep, lineIndex));
+    }
+    this->lineClearStep++;
+    if (this->lineClearStep == GRID_WIDTH / 2) {
+        this->grid.clearRows(this->linesToClear);
+        this->lineClearStep = 0;
+        this->linesToClear.clear();
     }
 }
