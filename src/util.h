@@ -1,7 +1,7 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-#include <raylib.h>
+#include "constants.h"
 
 enum Direction {
     down,
@@ -16,15 +16,15 @@ class Position {
         Position(int _x, int _y): x(_x), y(_y) {}
 };
 
-class Timer {
-    private:
-        double startTime;
+class FrameCounter {
     public:
-        Timer() { this->startTime = GetTime(); }
+    int framesPerGridCellCounter = 0;
+    int framesPerSoftDropCounter = 0;
+    int framesPerTetronimoResetCounter = 0;
+    int framesPerLineClearCounter = 0;
 
-        void start() { this->startTime = GetTime(); }
-
-        double getElapsed() { return GetTime() - this->startTime; }
+    void nextFrame();
+    void resetCounters();
 };
 
 #endif

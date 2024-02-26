@@ -1,3 +1,5 @@
+#include <raylib.h>
+
 #include "tetris.h"
 #include "constants.h"
 
