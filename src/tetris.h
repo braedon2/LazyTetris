@@ -3,13 +3,41 @@
 
 #include <ranlib.h>
 #include <vector>
+#include <map>
 #include "util.h"
+
+enum TetronimoShape { l, J, L, O, S, T, Z };
 
 class GridCell {
     public:
     Color color;
     bool isEmpty;
     GridCell(Color _color, bool _isEmpty): color(_color), isEmpty(_isEmpty) {}
+};
+
+const std::map<TetronimoShape, std::vector<std::vector<Position>>> rotationListMap = {
+    { T, { 
+        {{4,0}, {5,0}, {6,0}, {5,1}},
+        {{5,-1}, {4,0}, {5,0}, {5,1}},
+        {{5,-1}, {4,0}, {5,0}, {6,0}},
+        {{5,-1}, {5,0}, {6,0}, {5,1}}
+    }}
+};
+
+class Tetronimo {
+    private:
+    TetronimoShape shape;
+    std::vector<std::vector<Position>> rotationList;
+    int xDelta;
+    int yDelta;
+    int rotationStep;
+
+    public:
+    Tetronimo(TetronimoShape shape);
+    Tetronimo(TetronimoShape shape, int xDelta, int yDelta, int rotationStep);
+    std::vector<Position> getPositions();
+    Tetronimo move(Direction direction);
+    Tetronimo rotate(Rotation rotation);
 };
 
 class GameGrid {
@@ -23,7 +51,7 @@ class GameGrid {
     Color getColor(Position p);
     void setCell(Position p, Color color);
     void clearCell(Position p);
-    bool checkCollision(Position p);
+    bool checkCollision(std::vector<Position> positions);
     std::vector<int> getFullRows();
     void clearRows(std::vector<int> row_indexes);
 };
@@ -35,7 +63,7 @@ class GameState {
     GameGrid grid;
 
     // The falling tetromino being controlled by the player
-    Position currentTetronimo = Position(0, 0);
+    Tetronimo currentTetronimo = Tetronimo(T);
 
     // Flag keeps track of if the current tetromino has been placed in the grid. 
     // Flag is set by moveTetronimo member function when the current tetronimo can no longer move
@@ -49,7 +77,7 @@ class GameState {
 
     public:
     GameGrid getGrid();
-    Position getCurrentTetronimo();
+    Tetronimo getCurrentTetronimo();
     bool isCurrentTetrominoPlaced();
     void initNewTetronimo();
 
@@ -59,6 +87,8 @@ class GameState {
     // A down movement that results in a collision causes the current tetromino to be placed where it 
     // is in the grid and a new tetromino to be initialized
     void moveTetronimo(Direction direction);
+
+    void rotateTetronimo(Rotation rotation);
 
     // returns true if a row clear animation is in progress. This means that rowsToClear and 
     // rowClearStep attributes are set

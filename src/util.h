@@ -3,6 +3,8 @@
 
 #include "constants.h"
 
+enum Rotation { clockwise, counterClockwise };
+
 enum Direction {
     down,
     right,

@@ -27,6 +27,12 @@ int main(void) {
         if (IsKeyPressed(KEY_LEFT)) {
             state.moveTetronimo(left);
         }
+        if (IsKeyPressed(KEY_Z)) {
+            state.rotateTetronimo(counterClockwise);
+        } 
+        if (IsKeyPressed(KEY_X)) {
+            state.rotateTetronimo(clockwise);
+        }
         if (IsKeyDown(KEY_DOWN) and frameCounter.framesPerSoftDropCounter >= FRAMES_PER_SOFT_DROP and not disableKeyDown) {
             state.moveTetronimo(down);
             frameCounter.resetCounters();
@@ -65,11 +71,12 @@ int main(void) {
 
 void drawFrame(GameState state) {
     BeginDrawing();
-        Position pos = state.getCurrentTetronimo();
         ClearBackground(RAYWHITE);
         if (not state.isCurrentTetrominoPlaced()) {
-            DrawRectangle(pos.x * BLOCK_SIZE, BLOCK_SIZE * pos.y, BLOCK_SIZE, BLOCK_SIZE, RED);
-            DrawRectangleLines(pos.x * BLOCK_SIZE, BLOCK_SIZE * pos.y, BLOCK_SIZE, BLOCK_SIZE, BLACK);
+            for (auto pos : state.getCurrentTetronimo().getPositions()) {
+                DrawRectangle(pos.x * BLOCK_SIZE, BLOCK_SIZE * pos.y, BLOCK_SIZE, BLOCK_SIZE, RED);
+                DrawRectangleLines(pos.x * BLOCK_SIZE, BLOCK_SIZE * pos.y, BLOCK_SIZE, BLOCK_SIZE, BLACK);
+            }
         }
 
         GameGrid grid = state.getGrid();

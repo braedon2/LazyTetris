@@ -3,6 +3,57 @@
 #include "tetris.h"
 #include "constants.h"
 
+/***********
+ * Tetronimo
+ ***********/
+
+Tetronimo::Tetronimo(TetronimoShape shape) {
+    this->shape = shape;
+    this->rotationList = rotationListMap.at(shape);
+    this->xDelta = 0;
+    this->yDelta = 0;
+    this->rotationStep = 0;
+}
+
+Tetronimo::Tetronimo(TetronimoShape shape, int xDelta, int yDelta, int rotationStep) {
+    this->shape = shape;
+    this->rotationList = rotationListMap.at(shape);
+    this->xDelta = xDelta;
+    this->yDelta = yDelta;
+    this->rotationStep = rotationStep % this->rotationList.size();
+}
+
+std::vector<Position> Tetronimo::getPositions() {
+    std::vector<Position> positions;
+    for (Position p : this->rotationList[this->rotationStep]) {
+        positions.push_back({p.x + this->xDelta, p.y + this->yDelta});
+    }
+    return positions;
+}
+
+Tetronimo Tetronimo::move(Direction direction) {
+    if (direction == down) {
+        return Tetronimo(this->shape, this->xDelta, this->yDelta + 1, this->rotationStep);
+    }
+    else if (direction == right) {
+        return Tetronimo(this->shape, this->xDelta + 1, this->yDelta, this->rotationStep);
+    }
+    else { // direction == left
+        return Tetronimo(this->shape, this->xDelta - 1, this->yDelta, this->rotationStep);
+    }
+}
+
+Tetronimo Tetronimo::rotate(Rotation rotation) {
+    int rotationStep;
+    if (rotation == clockwise) {
+        rotationStep = (this->rotationStep + 1) % this->rotationList.size();
+    }
+    else { // rotation == counterClockwise
+        rotationStep = (this->rotationStep - 1) % this->rotationList.size();
+    }
+    return Tetronimo(this->shape, this->xDelta, this->yDelta, rotationStep);
+}
+
 /**********
  * GameGrid
  **********/
@@ -29,15 +80,17 @@ void GameGrid::clearCell(Position p) {
     this->grid[p.y][p.x] = GridCell(BLANK, true);
 }
 
-bool GameGrid::checkCollision(Position p) {
-    if (p.x < 0 or p.x >= GRID_WIDTH) {
-        return true;
-    }
-    if (p.y >= GRID_HEIGHT) {
-        return true;
-    }
-    if (!this->isEmpty(p)) {
-        return true;
+bool GameGrid::checkCollision(std::vector<Position> positions) {
+    for (auto p : positions) {
+        if (p.x < 0 or p.x >= GRID_WIDTH) {
+            return true;
+        }
+        if (p.y >= GRID_HEIGHT) {
+            return true;
+        }
+        if (p.y >= 0 && !this->isEmpty(p)) {
+            return true;
+        }
     }
     return false;
 }
@@ -74,11 +127,11 @@ void GameGrid::clearRows(std::vector<int> row_indices) {
  ***********/
 
 GameGrid GameState::getGrid() { return this->grid; }
-Position GameState::getCurrentTetronimo() { return this->currentTetronimo; }
+Tetronimo GameState::getCurrentTetronimo() { return this->currentTetronimo; }
 bool GameState::isCurrentTetrominoPlaced() { return this->isCurrentTetronimoPlaced; }
 
 void GameState::initNewTetronimo() { 
-    this->currentTetronimo = Position(0, 0); 
+    this->currentTetronimo = Tetronimo(T); 
     this->isCurrentTetronimoPlaced = false;
 }
 
@@ -89,9 +142,11 @@ void GameState::moveTetronimo(Direction direction) {
     }
 
     if (direction == down) {
-        Position tmpTetronimo(this->currentTetronimo.x, this->currentTetronimo.y + 1);
-        if (this->grid.checkCollision(tmpTetronimo)) {
-            this->grid.setCell(this->currentTetronimo, RED);
+        Tetronimo tmpTetronimo = this->currentTetronimo.move(down);
+        if (this->grid.checkCollision(tmpTetronimo.getPositions())) {
+            for (auto p : this->currentTetronimo.getPositions()) {
+                this->grid.setCell(p, RED);
+            }
             this->isCurrentTetronimoPlaced = true;
             this->linesToClear = this->grid.getFullRows();
         }
@@ -99,17 +154,18 @@ void GameState::moveTetronimo(Direction direction) {
             this->currentTetronimo = tmpTetronimo;
         }
     }
-    else if (direction == right) {
-        Position tmpTetronimo(this->currentTetronimo.x + 1, this->currentTetronimo.y);
-        if (not this->grid.checkCollision(tmpTetronimo)) {
+    else { // direction is left or right
+        Tetronimo tmpTetronimo = this->currentTetronimo.move(direction);
+        if (not this->grid.checkCollision(tmpTetronimo.getPositions())) {
             this->currentTetronimo = tmpTetronimo;
         }
     }
-    else if (direction == left) {
-        Position tmpTetronimo(this->currentTetronimo.x - 1, this->currentTetronimo.y);
-        if (not this->grid.checkCollision(tmpTetronimo)) {
-            this->currentTetronimo = tmpTetronimo;
-        }
+}
+
+void GameState::rotateTetronimo(Rotation rotation) {
+    Tetronimo tmpTetronimo = this->currentTetronimo.rotate(rotation);
+    if (not this->grid.checkCollision(tmpTetronimo.getPositions())) {
+        this->currentTetronimo = tmpTetronimo;
     }
 }
 
