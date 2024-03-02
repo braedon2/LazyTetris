@@ -1,5 +1,7 @@
 #include <vector>
 #include <iostream>
+#include <cstdlib>
+#include <time.h>
 
 #include <raylib.h>
 #include <raymath.h>
@@ -11,6 +13,7 @@
 void drawFrame(GameState state);
 
 int main(void) { 
+    srand(time(0));
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tetris");
     SetTargetFPS(30); // my 2014 macbook gets too warm at 60 fps
     
@@ -56,12 +59,12 @@ int main(void) {
             }
         }
 
-        drawFrame(state);
-
         if (state.isCurrentTetrominoPlaced() and frameCounter.framesPerTetronimoResetCounter >= FRAMES_PER_TETRONIMO_RESET) {
             state.initNewTetronimo();
             frameCounter.resetCounters();
         }
+
+        drawFrame(state);
     }
     
     CloseWindow();

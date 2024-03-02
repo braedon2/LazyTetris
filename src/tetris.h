@@ -3,10 +3,9 @@
 
 #include <ranlib.h>
 #include <vector>
-#include <map>
-#include "util.h"
 
-enum TetronimoShape { l, J, L, O, S, T, Z };
+#include "util.h"
+#include "constants.h"
 
 class GridCell {
     public:
@@ -15,26 +14,17 @@ class GridCell {
     GridCell(Color _color, bool _isEmpty): color(_color), isEmpty(_isEmpty) {}
 };
 
-const std::map<TetronimoShape, std::vector<std::vector<Position>>> rotationListMap = {
-    { T, { 
-        {{4,0}, {5,0}, {6,0}, {5,1}},
-        {{5,-1}, {4,0}, {5,0}, {5,1}},
-        {{5,-1}, {4,0}, {5,0}, {6,0}},
-        {{5,-1}, {5,0}, {6,0}, {5,1}}
-    }}
-};
-
 class Tetronimo {
     private:
-    TetronimoShape shape;
+    TetronimoType shape;
     std::vector<std::vector<Position>> rotationList;
     int xDelta;
     int yDelta;
     int rotationStep;
 
     public:
-    Tetronimo(TetronimoShape shape);
-    Tetronimo(TetronimoShape shape, int xDelta, int yDelta, int rotationStep);
+    Tetronimo(TetronimoType shape);
+    Tetronimo(TetronimoType shape, int xDelta, int yDelta, int rotationStep);
     std::vector<Position> getPositions();
     Tetronimo move(Direction direction);
     Tetronimo rotate(Rotation rotation);
@@ -76,6 +66,7 @@ class GameState {
     int lineClearStep = 0; 
 
     public:
+    GameState();
     GameGrid getGrid();
     Tetronimo getCurrentTetronimo();
     bool isCurrentTetrominoPlaced();

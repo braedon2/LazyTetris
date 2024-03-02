@@ -1,3 +1,5 @@
+#include <cstdlib>
+
 #include <raylib.h>
 
 #include "tetris.h"
@@ -7,7 +9,7 @@
  * Tetronimo
  ***********/
 
-Tetronimo::Tetronimo(TetronimoShape shape) {
+Tetronimo::Tetronimo(TetronimoType shape) {
     this->shape = shape;
     this->rotationList = rotationListMap.at(shape);
     this->xDelta = 0;
@@ -15,7 +17,7 @@ Tetronimo::Tetronimo(TetronimoShape shape) {
     this->rotationStep = 0;
 }
 
-Tetronimo::Tetronimo(TetronimoShape shape, int xDelta, int yDelta, int rotationStep) {
+Tetronimo::Tetronimo(TetronimoType shape, int xDelta, int yDelta, int rotationStep) {
     this->shape = shape;
     this->rotationList = rotationListMap.at(shape);
     this->xDelta = xDelta;
@@ -126,12 +128,16 @@ void GameGrid::clearRows(std::vector<int> row_indices) {
  * GameState
  ***********/
 
+GameState::GameState() {
+    this->currentTetronimo = Tetronimo(static_cast<TetronimoType>(rand() % numTetronimoTypes)); 
+}
+
 GameGrid GameState::getGrid() { return this->grid; }
 Tetronimo GameState::getCurrentTetronimo() { return this->currentTetronimo; }
 bool GameState::isCurrentTetrominoPlaced() { return this->isCurrentTetronimoPlaced; }
 
 void GameState::initNewTetronimo() { 
-    this->currentTetronimo = Tetronimo(T); 
+    this->currentTetronimo = Tetronimo(static_cast<TetronimoType>(rand() % numTetronimoTypes)); 
     this->isCurrentTetronimoPlaced = false;
 }
 

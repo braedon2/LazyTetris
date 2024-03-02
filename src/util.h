@@ -1,16 +1,6 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-#include "constants.h"
-
-enum Rotation { clockwise, counterClockwise };
-
-enum Direction {
-    down,
-    right,
-    left
-};
-
 class Position {
     public:
         int x;
