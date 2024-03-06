@@ -66,6 +66,8 @@ class GameState {
     int lineClearStep = 0; 
 
     public:
+    int linesCleared = 0;
+
     GameState();
     GameGrid getGrid();
     Tetronimo getCurrentTetronimo();

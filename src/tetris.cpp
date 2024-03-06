@@ -186,6 +186,7 @@ void GameState::nextLineClearStep() {
     }
     this->lineClearStep++;
     if (this->lineClearStep == GRID_WIDTH / 2) {
+        this->linesCleared += this->linesToClear.size();
         this->grid.clearRows(this->linesToClear);
         this->lineClearStep = 0;
         this->linesToClear.clear();

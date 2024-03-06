@@ -57,6 +57,9 @@ int main(void) {
                 state.nextLineClearStep();
                 frameCounter.resetCounters();
             }
+            if (not state.isLineClearInProgress()) {
+                std::cout << state.linesCleared << std::endl;
+            }
         }
 
         if (state.isCurrentTetrominoPlaced() and frameCounter.framesPerTetronimoResetCounter >= FRAMES_PER_TETRONIMO_RESET) {
@@ -74,11 +77,17 @@ int main(void) {
 
 void drawFrame(GameState state) {
     BeginDrawing();
-        ClearBackground(RAYWHITE);
+        ClearBackground(BLACK);
         if (not state.isCurrentTetrominoPlaced()) {
             for (auto pos : state.getCurrentTetronimo().getPositions()) {
-                DrawRectangle(pos.x * BLOCK_SIZE, BLOCK_SIZE * pos.y, BLOCK_SIZE, BLOCK_SIZE, RED);
-                DrawRectangleLines(pos.x * BLOCK_SIZE, BLOCK_SIZE * pos.y, BLOCK_SIZE, BLOCK_SIZE, BLACK);
+                DrawRectangle(
+                    (pos.x * BLOCK_SIZE) + (pos.x * GAP_SIZE) + GAP_SIZE, 
+                    (BLOCK_SIZE * pos.y) + (pos.y * GAP_SIZE) + GAP_SIZE, 
+                    BLOCK_SIZE, 
+                    BLOCK_SIZE, 
+                    RED
+                );
+                //DrawRectangleLines(pos.x * BLOCK_SIZE, BLOCK_SIZE * pos.y, BLOCK_SIZE, BLOCK_SIZE, BLACK);
             }
         }
 
@@ -87,8 +96,13 @@ void drawFrame(GameState state) {
             for (int y = 0; y < GRID_HEIGHT; y++) {
                 Position p(x, y);
                 if (!grid.isEmpty(p)) {
-                    DrawRectangle(BLOCK_SIZE * x, BLOCK_SIZE * y, BLOCK_SIZE, BLOCK_SIZE, grid.getColor(p));
-                    DrawRectangleLines(BLOCK_SIZE * x, BLOCK_SIZE * y, BLOCK_SIZE, BLOCK_SIZE, BLACK);
+                    DrawRectangle(
+                        (BLOCK_SIZE * x) + (x * GAP_SIZE) + GAP_SIZE, 
+                        (BLOCK_SIZE * y) + (y * GAP_SIZE) + GAP_SIZE, 
+                        BLOCK_SIZE, 
+                        BLOCK_SIZE, 
+                        grid.getColor(p)
+                    );
                 }
             }
         }
