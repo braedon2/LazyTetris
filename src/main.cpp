@@ -10,12 +10,13 @@
 #include "constants.h"
 #include "tetris.h"
 
-void drawFrame(GameState state);
+void drawFrame(GameState state, Texture2D sprite);
 
 int main(void) { 
     srand(time(0));
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tetris");
     SetTargetFPS(30); // my 2014 macbook gets too warm at 60 fps
+    Texture2D sprite = LoadTexture("assets/level1-1.png");
     
     GameState state;
     FrameCounter frameCounter;
@@ -67,7 +68,7 @@ int main(void) {
             frameCounter.resetCounters();
         }
 
-        drawFrame(state);
+        drawFrame(state, sprite);
     }
     
     CloseWindow();
@@ -75,19 +76,21 @@ int main(void) {
 }
 
 
-void drawFrame(GameState state) {
+void drawFrame(GameState state, Texture2D sprite) {
     BeginDrawing();
         ClearBackground(BLACK);
         if (not state.isCurrentTetrominoPlaced()) {
             for (auto pos : state.getCurrentTetronimo().getPositions()) {
-                DrawRectangle(
-                    (pos.x * BLOCK_SIZE) + (pos.x * GAP_SIZE) + GAP_SIZE, 
-                    (BLOCK_SIZE * pos.y) + (pos.y * GAP_SIZE) + GAP_SIZE, 
-                    BLOCK_SIZE, 
-                    BLOCK_SIZE, 
-                    RED
+                float x = (pos.x * BLOCK_SIZE) + (pos.x * GAP_SIZE) + GAP_SIZE;
+                float y = (BLOCK_SIZE * pos.y) + (pos.y * GAP_SIZE) + GAP_SIZE;
+                DrawTexturePro(
+                    sprite,
+                    { 0.0f, 0.0f, (float)sprite.width, (float)sprite.height },
+                    { x, y, (float)BLOCK_SIZE, (float)BLOCK_SIZE},
+                    { 0.0f, 0.0f },
+                    0.0f,
+                    WHITE
                 );
-                //DrawRectangleLines(pos.x * BLOCK_SIZE, BLOCK_SIZE * pos.y, BLOCK_SIZE, BLOCK_SIZE, BLACK);
             }
         }
 
