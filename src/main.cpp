@@ -10,16 +10,17 @@
 #include "constants.h"
 #include "tetris.h"
 
-void drawFrame(GameState state, Texture2D sprite);
-
 int main(void) { 
+    // third party setup
     srand(time(0));
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tetris");
     SetTargetFPS(30); // my 2014 macbook gets too warm at 60 fps
-    Texture2D sprite = LoadTexture("assets/level1-1.png");
     
+    // core game logic classes
     GameState state;
     FrameCounter frameCounter;
+    FrameDrawer frameDrawer;
+    
     bool disableKeyDown = false;
 
     while (!WindowShouldClose()) {
@@ -68,46 +69,9 @@ int main(void) {
             frameCounter.resetCounters();
         }
 
-        drawFrame(state, sprite);
+        frameDrawer.drawFrame(state);
     }
     
     CloseWindow();
     return 0;
-}
-
-
-void drawFrame(GameState state, Texture2D sprite) {
-    BeginDrawing();
-        ClearBackground(BLACK);
-        if (not state.isCurrentTetrominoPlaced()) {
-            for (auto pos : state.getCurrentTetronimo().getPositions()) {
-                float x = (pos.x * BLOCK_SIZE) + (pos.x * GAP_SIZE) + GAP_SIZE;
-                float y = (BLOCK_SIZE * pos.y) + (pos.y * GAP_SIZE) + GAP_SIZE;
-                DrawTexturePro(
-                    sprite,
-                    { 0.0f, 0.0f, (float)sprite.width, (float)sprite.height },
-                    { x, y, (float)BLOCK_SIZE, (float)BLOCK_SIZE},
-                    { 0.0f, 0.0f },
-                    0.0f,
-                    WHITE
-                );
-            }
-        }
-
-        GameGrid grid = state.getGrid();
-        for (int x = 0; x < GRID_WIDTH; x++) {
-            for (int y = 0; y < GRID_HEIGHT; y++) {
-                Position p(x, y);
-                if (!grid.isEmpty(p)) {
-                    DrawRectangle(
-                        (BLOCK_SIZE * x) + (x * GAP_SIZE) + GAP_SIZE, 
-                        (BLOCK_SIZE * y) + (y * GAP_SIZE) + GAP_SIZE, 
-                        BLOCK_SIZE, 
-                        BLOCK_SIZE, 
-                        grid.getColor(p)
-                    );
-                }
-            }
-        }
-    EndDrawing();
 }

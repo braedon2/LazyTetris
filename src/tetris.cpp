@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <string>
 
 #include <raylib.h>
 
@@ -62,7 +63,7 @@ Tetronimo Tetronimo::rotate(Rotation rotation) {
 
 GameGrid::GameGrid() {
     for (int i = 0; i < GRID_HEIGHT; i++) {
-        grid.push_back(std::vector<GridCell>(GRID_WIDTH, GridCell(BLANK, true)));
+        grid.push_back(std::vector<GridCell>(GRID_WIDTH, GridCell(0, true)));
     }
 }
 
@@ -70,16 +71,16 @@ bool GameGrid::isEmpty(Position p) {
     return this->grid[p.y][p.x].isEmpty;
 }
 
-Color GameGrid::getColor(Position p) {
-    return this->grid[p.y][p.x].color;
+int GameGrid::getSpriteType(Position p) {
+    return this->grid[p.y][p.x].spriteType;
 }
 
-void GameGrid::setCell(Position p, Color color) {
-    this->grid[p.y][p.x] = GridCell(color, false);
+void GameGrid::setCell(Position p, int spriteType) {
+    this->grid[p.y][p.x] = GridCell(spriteType, false);
 }
 
 void GameGrid::clearCell(Position p) {
-    this->grid[p.y][p.x] = GridCell(BLANK, true);
+    this->grid[p.y][p.x] = GridCell(0, true);
 }
 
 bool GameGrid::checkCollision(std::vector<Position> positions) {
@@ -120,7 +121,7 @@ void GameGrid::clearRows(std::vector<int> row_indices) {
         this->grid.erase(this->grid.begin() + i);
         this->grid.insert(
             this->grid.begin(), 
-            std::vector<GridCell>(GRID_WIDTH, GridCell(BLANK, true)));
+            std::vector<GridCell>(GRID_WIDTH, GridCell(0, true)));
     }
 }
 
@@ -151,7 +152,7 @@ void GameState::moveTetronimo(Direction direction) {
         Tetronimo tmpTetronimo = this->currentTetronimo.move(down);
         if (this->grid.checkCollision(tmpTetronimo.getPositions())) {
             for (auto p : this->currentTetronimo.getPositions()) {
-                this->grid.setCell(p, RED);
+                this->grid.setCell(p, spriteMap.at(this->currentTetronimo.shape));
             }
             this->isCurrentTetronimoPlaced = true;
             this->linesToClear = this->grid.getFullRows();
@@ -191,4 +192,62 @@ void GameState::nextLineClearStep() {
         this->lineClearStep = 0;
         this->linesToClear.clear();
     }
+}
+
+FrameDrawer::FrameDrawer() {
+    std::vector<std::string> spriteTypes = {"1", "2", "3", "4"};
+    std::string level("1");
+
+    std::vector<Texture2D> tmpList;
+    for (auto spriteType : spriteTypes) {
+        std::string filename = "assets/level" + level + "-" + spriteType + ".png";
+        tmpList.push_back(LoadTexture(filename.c_str()));
+    }
+    this->levelTextures.push_back(tmpList);
+}
+
+void FrameDrawer::drawFrame(GameState state) {
+    Texture2D sprite;
+    BeginDrawing();
+        ClearBackground(BLACK);
+        // draw current tetronimo
+        if (not state.isCurrentTetrominoPlaced()) {
+            sprite = this->levelTextures[0][spriteMap.at(state.getCurrentTetronimo().shape) - 1];
+            for (auto gridPos : state.getCurrentTetronimo().getPositions()) {
+                float x = (gridPos.x * BLOCK_SIZE) + (gridPos.x * GAP_SIZE) + GAP_SIZE;
+                float y = (BLOCK_SIZE * gridPos.y) + (gridPos.y * GAP_SIZE) + GAP_SIZE;
+                DrawTexturePro(
+                    sprite,
+                    { 0.0f, 0.0f, (float)sprite.width, (float)sprite.height },
+                    { x, y, (float)BLOCK_SIZE, (float)BLOCK_SIZE},
+                    { 0.0f, 0.0f },
+                    0.0f,
+                    WHITE
+                );
+            }
+        }
+
+        // draw grid cells
+        GameGrid grid = state.getGrid();
+        for (int gridX = 0; gridX < GRID_WIDTH; gridX++) {
+            for (int gridY = 0; gridY < GRID_HEIGHT; gridY++) {
+                Position gridPos(gridX, gridY);
+
+                if (!grid.isEmpty(gridPos)) {
+                    sprite = this->levelTextures[0][grid.getSpriteType(gridPos) - 1];
+                    float x = (gridPos.x * BLOCK_SIZE) + (gridPos.x * GAP_SIZE) + GAP_SIZE;
+                    float y = (BLOCK_SIZE * gridPos.y) + (gridPos.y * GAP_SIZE) + GAP_SIZE;
+
+                    DrawTexturePro(
+                        sprite,
+                        { 0.0f, 0.0f, (float)sprite.width, (float)sprite.height },
+                        { x, y, (float)BLOCK_SIZE, (float)BLOCK_SIZE},
+                        { 0.0f, 0.0f },
+                        0.0f,
+                        WHITE
+                    );
+                }
+            }
+        }
+    EndDrawing();
 }

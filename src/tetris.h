@@ -8,13 +8,17 @@
 #include "constants.h"
 
 enum Rotation { clockwise, counterClockwise };
-enum Direction {
-    down,
-    right,
-    left
-};
+enum Direction { down, right, left };
 enum TetronimoType { l, J, L, O, S, T, Z };
 const int numTetronimoTypes = 6;
+
+/*
+* Maps a tetronimo type to a sprite type of which each level has four.
+* The mapped number represents which file the texture comes from.
+* For example, if the game is on level one, tetronimo of type Z maps to the texture
+* found in level1-3.png since Z maps to integer 3
+*/
+const std::map<TetronimoType,int> spriteMap = { {T, 1}, {J, 2}, {Z, 3}, {O, 4}, {S, 2}, {L, 3}, {l, 1}}; 
 
 /*
 * Maps each tetronimo type to a list of initial positions
@@ -69,21 +73,21 @@ const std::map<TetronimoType, std::vector<std::vector<Position>>> rotationListMa
 
 class GridCell {
     public:
-    Color color;
+    int spriteType;
     bool isEmpty;
-    GridCell(Color _color, bool _isEmpty): color(_color), isEmpty(_isEmpty) {}
+    GridCell(int _spriteType, bool _isEmpty): spriteType(_spriteType), isEmpty(_isEmpty) {}
 };
 
 class Tetronimo {
     private:
     
-    TetronimoType shape;
     std::vector<std::vector<Position>> rotationList;
     int xDelta;
     int yDelta;
     int rotationStep;
 
     public:
+    TetronimoType shape;
     Tetronimo(TetronimoType shape);
     Tetronimo(TetronimoType shape, int xDelta, int yDelta, int rotationStep);
     std::vector<Position> getPositions();
@@ -98,8 +102,8 @@ class GameGrid {
     public:
     GameGrid();
     bool isEmpty(Position p);
-    Color getColor(Position p);
-    void setCell(Position p, Color color);
+    int getSpriteType(Position p); // returns a number between 1-4, or 0 if the cell is empty
+    void setCell(Position p, int spriteType);
     void clearCell(Position p);
     bool checkCollision(std::vector<Position> positions);
     std::vector<int> getFullRows();
@@ -161,7 +165,12 @@ class GameState {
 
 
 class FrameDrawer {
+    private:
+    std::vector<std::vector<Texture2D>> levelTextures;
 
+    public:
+    FrameDrawer(); // loads all the sprite textures into levelTextures
+    void drawFrame(GameState state);
 };
 
 #endif
