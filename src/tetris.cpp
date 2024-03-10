@@ -10,7 +10,7 @@
  * Tetronimo
  ***********/
 
-Tetronimo::Tetronimo(TetronimoType shape) {
+Tetronimo::Tetronimo(TetronimoShape shape) {
     this->shape = shape;
     this->rotationList = rotationListMap.at(shape);
     this->xDelta = 0;
@@ -18,7 +18,7 @@ Tetronimo::Tetronimo(TetronimoType shape) {
     this->rotationStep = 0;
 }
 
-Tetronimo::Tetronimo(TetronimoType shape, int xDelta, int yDelta, int rotationStep) {
+Tetronimo::Tetronimo(TetronimoShape shape, int xDelta, int yDelta, int rotationStep) {
     this->shape = shape;
     this->rotationList = rotationListMap.at(shape);
     this->xDelta = xDelta;
@@ -130,7 +130,7 @@ void GameGrid::clearRows(std::vector<int> row_indices) {
  ***********/
 
 GameState::GameState() {
-    this->currentTetronimo = Tetronimo(static_cast<TetronimoType>(rand() % numTetronimoTypes)); 
+    this->currentTetronimo = Tetronimo(static_cast<TetronimoShape>(rand() % numTetronimoShapes)); 
 }
 
 GameGrid GameState::getGrid() { return this->grid; }
@@ -138,7 +138,7 @@ Tetronimo GameState::getCurrentTetronimo() { return this->currentTetronimo; }
 bool GameState::isCurrentTetrominoPlaced() { return this->isCurrentTetronimoPlaced; }
 
 void GameState::initNewTetronimo() { 
-    this->currentTetronimo = Tetronimo(static_cast<TetronimoType>(rand() % numTetronimoTypes)); 
+    this->currentTetronimo = Tetronimo(static_cast<TetronimoShape>(rand() % numTetronimoShapes)); 
     this->isCurrentTetronimoPlaced = false;
 }
 
@@ -212,7 +212,9 @@ void FrameDrawer::drawFrame(GameState state) {
         ClearBackground(BLACK);
         // draw current tetronimo
         if (not state.isCurrentTetrominoPlaced()) {
-            sprite = this->levelTextures[0][spriteMap.at(state.getCurrentTetronimo().shape) - 1];
+            Tetronimo tetronimo = state.getCurrentTetronimo();
+            int spriteIndex = spriteMap.at(tetronimo.shape) - 1;
+            sprite = this->levelTextures[0][spriteMap.at(tetronimo.shape) - 1];
             for (auto gridPos : state.getCurrentTetronimo().getPositions()) {
                 float x = (gridPos.x * BLOCK_SIZE) + (gridPos.x * GAP_SIZE) + GAP_SIZE;
                 float y = (BLOCK_SIZE * gridPos.y) + (gridPos.y * GAP_SIZE) + GAP_SIZE;

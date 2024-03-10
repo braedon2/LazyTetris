@@ -9,25 +9,25 @@
 
 enum Rotation { clockwise, counterClockwise };
 enum Direction { down, right, left };
-enum TetronimoType { l, J, L, O, S, T, Z };
-const int numTetronimoTypes = 6;
+enum TetronimoShape { l, J, L, O, S, T, Z };
+const int numTetronimoShapes = 6;
 
 /*
-* Maps a tetronimo type to a sprite type of which each level has four.
+* Maps a tetronimo shape to a sprite type of which each level has four.
 * The mapped number represents which file the texture comes from.
-* For example, if the game is on level one, tetronimo of type Z maps to the texture
+* For example, if the game is on level one, tetronimo of shape Z maps to the texture
 * found in level1-3.png since Z maps to integer 3
 */
-const std::map<TetronimoType,int> spriteMap = { {T, 1}, {J, 2}, {Z, 3}, {O, 4}, {S, 2}, {L, 3}, {l, 1}}; 
+const std::map<TetronimoShape,int> spriteMap = { {T, 1}, {J, 2}, {Z, 3}, {O, 4}, {S, 2}, {L, 3}, {l, 1}}; 
 
 /*
-* Maps each tetronimo type to a list of initial positions
+* Maps each tetronimo shape to a list of initial positions
 * The first item of each rotation list is the initial position for a newly spawned tetronimo of 
-* that type. The next list of positions for a type are the positions of the tetronimo if it were
+* that shape. The next list of positions for a shape are the positions of the tetronimo if it were
 * rotated clockwise. 
 *
 * For example:
-* The first item in the rotation list for tetronimo type T looks like
+* The first item in the rotation list for tetronimo shape T looks like
 *  000
 *   0
 * The second item in the rotation list is the previous representation rotated 90 degrees clockwise
@@ -35,7 +35,7 @@ const std::map<TetronimoType,int> spriteMap = { {T, 1}, {J, 2}, {Z, 3}, {O, 4}, 
 *  00
 *   0
 */
-const std::map<TetronimoType, std::vector<std::vector<Position>>> rotationListMap = {
+const std::map<TetronimoShape, std::vector<std::vector<Position>>> rotationListMap = {
     { T, { 
         {{4,0}, {5,0}, {6,0}, {5,1}},
         {{5,-1}, {4,0}, {5,0}, {5,1}},
@@ -87,9 +87,9 @@ class Tetronimo {
     int rotationStep;
 
     public:
-    TetronimoType shape;
-    Tetronimo(TetronimoType shape);
-    Tetronimo(TetronimoType shape, int xDelta, int yDelta, int rotationStep);
+    TetronimoShape shape;
+    Tetronimo(TetronimoShape shape);
+    Tetronimo(TetronimoShape shape, int xDelta, int yDelta, int rotationStep);
     std::vector<Position> getPositions();
     Tetronimo move(Direction direction);
     Tetronimo rotate(Rotation rotation);
