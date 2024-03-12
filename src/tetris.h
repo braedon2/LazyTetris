@@ -137,6 +137,7 @@ class GameState {
     GameState();
     GameGrid getGrid();
     Tetronimo getCurrentTetronimo();
+    Tetronimo getNextTetronimo();
     bool isCurrentTetrominoPlaced();
     void initNewTetronimo();
 
@@ -171,6 +172,13 @@ class FrameDrawer {
     private:
     std::vector<std::vector<Texture2D>> levelTextures;
     Font font;
+
+    /*
+    * The rotation list positions are hardcoded to center a new tetronimo in the game grid.
+    * This function calculates how much to remove from the x-values of all the positions to 
+    * undo that centering. Basically it returns the minimum x-value of all the tetronimos positions.
+    */
+    int nextTetronimoXAdjust(Tetronimo tetronimo);
 
     public:
     FrameDrawer(); // loads all the sprite textures into levelTextures

@@ -138,6 +138,7 @@ GameState::GameState() {
 
 GameGrid GameState::getGrid() { return this->grid; }
 Tetronimo GameState::getCurrentTetronimo() { return this->currentTetronimo; }
+Tetronimo GameState::getNextTetronimo() { return this->nextTetronimo; }
 bool GameState::isCurrentTetrominoPlaced() { return this->isCurrentTetronimoPlaced; }
 
 void GameState::initNewTetronimo() { 
@@ -199,7 +200,7 @@ void GameState::nextLineClearStep() {
 }
 
 FrameDrawer::FrameDrawer() {
-    this->font = LoadFontEx("assets/CommitMonoNerdFont-Regular.otf", 28, NULL, 0);
+    this->font = LoadFontEx("assets/CommitMonoNerdFont-Regular.otf", 24, NULL, 0);
 
     std::vector<std::string> spriteTypes = {"1", "2", "3", "4"};
     std::string level("1");
@@ -212,16 +213,24 @@ FrameDrawer::FrameDrawer() {
     this->levelTextures.push_back(tmpList);
 }
 
+int FrameDrawer::nextTetronimoXAdjust(Tetronimo tetronimo) {
+    int ret = 10; // arbitrary large number
+    for (auto pos : tetronimo.getPositions()) {
+        if (pos.x < ret) {
+            ret = pos.x;
+        }
+    }
+    return ret;
+}
+
 void FrameDrawer::drawFrame(GameState state) {
-    Texture2D sprite;
     BeginDrawing();
         ClearBackground(BLACK);
         // draw current tetronimo
         if (not state.isCurrentTetrominoPlaced()) {
             Tetronimo tetronimo = state.getCurrentTetronimo();
-            int spriteIndex = spriteMap.at(tetronimo.shape) - 1;
-            sprite = this->levelTextures[0][spriteMap.at(tetronimo.shape) - 1];
-            for (auto gridPos : state.getCurrentTetronimo().getPositions()) {
+            Texture2D sprite = this->levelTextures[0][spriteMap.at(tetronimo.shape) - 1];
+            for (auto gridPos : tetronimo.getPositions()) {
                 float x = (gridPos.x * BLOCK_SIZE) + (gridPos.x * GAP_SIZE) + GAP_SIZE;
                 float y = (BLOCK_SIZE * gridPos.y) + (gridPos.y * GAP_SIZE) + GAP_SIZE;
                 DrawTexturePro(
@@ -242,7 +251,7 @@ void FrameDrawer::drawFrame(GameState state) {
                 Position gridPos(gridX, gridY);
 
                 if (!grid.isEmpty(gridPos)) {
-                    sprite = this->levelTextures[0][grid.getSpriteType(gridPos) - 1];
+                    Texture2D sprite = this->levelTextures[0][grid.getSpriteType(gridPos) - 1];
                     float x = (gridPos.x * BLOCK_SIZE) + (gridPos.x * GAP_SIZE) + GAP_SIZE;
                     float y = (BLOCK_SIZE * gridPos.y) + (gridPos.y * GAP_SIZE) + GAP_SIZE;
 
@@ -260,11 +269,30 @@ void FrameDrawer::drawFrame(GameState state) {
 
         DrawLine(GRID_FRAME_WIDTH, 0, GRID_FRAME_WIDTH, GRID_FRAME_HEIGHT, WHITE);
 
-        DrawTextEx(this->font, "Lines:", {GRID_FRAME_WIDTH + 10, 10}, 14, 0, WHITE);
+        DrawTextEx(this->font, "Lines:", {GRID_FRAME_WIDTH + 10, 10}, 12, 0, WHITE);
         std::stringstream ss;
         ss << std::setfill('0') << std::setw(4) << state.linesCleared;
-        DrawTextEx(this->font, ss.str().c_str(), {GRID_FRAME_WIDTH + 10, 28} , 14, 0, WHITE);
+        DrawTextEx(this->font, ss.str().c_str(), {GRID_FRAME_WIDTH + 10, 24} , 12, 0, WHITE);
 
-        DrawTextEx(this->font, "Next:", {GRID_FRAME_WIDTH + 10, 56}, 14, 0, WHITE);
+        // draw next tetronimo
+        DrawTextEx(this->font, "Next:", {GRID_FRAME_WIDTH + 10, 56}, 12, 0, WHITE);
+        int nextXOffset = GRID_FRAME_WIDTH + 10;
+        int nextYOffset = 74;
+        Tetronimo tetronimo = state.getNextTetronimo();
+        auto positions = rotationListMap.at(tetronimo.shape)[0];
+        int xAdjust = this->nextTetronimoXAdjust(tetronimo);
+        Texture2D sprite = this->levelTextures[0][spriteMap.at(tetronimo.shape) - 1];
+        for (auto pos : positions) {
+            float x = nextXOffset + ((pos.x - xAdjust) * BLOCK_SIZE) + ((pos.x - xAdjust) * GAP_SIZE);
+            float y = nextYOffset + (BLOCK_SIZE * pos.y) + (pos.y * GAP_SIZE);
+            DrawTexturePro(
+                sprite,
+                { 0.0f, 0.0f, (float)sprite.width, (float)sprite.height },
+                { x, y, (float)BLOCK_SIZE, (float)BLOCK_SIZE},
+                { 0.0f, 0.0f },
+                0.0f,
+                WHITE
+            );
+        }
     EndDrawing();
 }
