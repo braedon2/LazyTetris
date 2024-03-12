@@ -91,6 +91,7 @@ class Tetronimo {
     TetronimoShape shape;
     Tetronimo(TetronimoShape shape);
     Tetronimo(TetronimoShape shape, int xDelta, int yDelta, int rotationStep);
+
     std::vector<Position> getPositions();
     Tetronimo move(Direction direction);
     Tetronimo rotate(Rotation rotation);
@@ -124,7 +125,8 @@ class GameState {
     */
     private:
     GameGrid grid;
-    Tetronimo currentTetronimo = Tetronimo(T);
+    Tetronimo currentTetronimo = Tetronimo(T); // replaced with random tetronimo in constructor
+    Tetronimo nextTetronimo = Tetronimo(T); // replacedw tih random tetronimo in constructor
     bool isCurrentTetronimoPlaced = false;
     std::vector<int> linesToClear;
     int lineClearStep = 0; 

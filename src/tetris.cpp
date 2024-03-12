@@ -133,6 +133,7 @@ void GameGrid::clearRows(std::vector<int> row_indices) {
 
 GameState::GameState() {
     this->currentTetronimo = Tetronimo(static_cast<TetronimoShape>(rand() % numTetronimoShapes)); 
+    this->nextTetronimo = Tetronimo(static_cast<TetronimoShape>(rand() % numTetronimoShapes));
 }
 
 GameGrid GameState::getGrid() { return this->grid; }
@@ -140,7 +141,8 @@ Tetronimo GameState::getCurrentTetronimo() { return this->currentTetronimo; }
 bool GameState::isCurrentTetrominoPlaced() { return this->isCurrentTetronimoPlaced; }
 
 void GameState::initNewTetronimo() { 
-    this->currentTetronimo = Tetronimo(static_cast<TetronimoShape>(rand() % numTetronimoShapes)); 
+    this->currentTetronimo = this->nextTetronimo;
+    this->nextTetronimo = Tetronimo(static_cast<TetronimoShape>(rand() % numTetronimoShapes)); 
     this->isCurrentTetronimoPlaced = false;
 }
 
@@ -197,7 +199,7 @@ void GameState::nextLineClearStep() {
 }
 
 FrameDrawer::FrameDrawer() {
-    this->font = LoadFont("assets/CommitMonoNerdFont-Regular.otf");
+    this->font = LoadFontEx("assets/CommitMonoNerdFont-Regular.otf", 28, NULL, 0);
 
     std::vector<std::string> spriteTypes = {"1", "2", "3", "4"};
     std::string level("1");
@@ -261,6 +263,8 @@ void FrameDrawer::drawFrame(GameState state) {
         DrawTextEx(this->font, "Lines:", {GRID_FRAME_WIDTH + 10, 10}, 14, 0, WHITE);
         std::stringstream ss;
         ss << std::setfill('0') << std::setw(4) << state.linesCleared;
-        DrawTextEx(this->font, ss.str().c_str(), {GRID_FRAME_WIDTH + 10, 22} , 14, 0, WHITE);
+        DrawTextEx(this->font, ss.str().c_str(), {GRID_FRAME_WIDTH + 10, 28} , 14, 0, WHITE);
+
+        DrawTextEx(this->font, "Next:", {GRID_FRAME_WIDTH + 10, 56}, 14, 0, WHITE);
     EndDrawing();
 }
