@@ -1,8 +1,9 @@
 #ifndef TETRIS_H
 #define TETRIS_H
 
-#include <ranlib.h>
 #include <vector>
+
+#include "raylib.h"
 
 #include "util.h"
 #include "constants.h"
@@ -167,6 +168,7 @@ class GameState {
 class FrameDrawer {
     private:
     std::vector<std::vector<Texture2D>> levelTextures;
+    Font font;
 
     public:
     FrameDrawer(); // loads all the sprite textures into levelTextures

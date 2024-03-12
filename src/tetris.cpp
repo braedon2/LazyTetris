@@ -1,5 +1,7 @@
 #include <cstdlib>
 #include <string>
+#include <sstream>
+#include <iomanip>
 
 #include <raylib.h>
 
@@ -195,6 +197,8 @@ void GameState::nextLineClearStep() {
 }
 
 FrameDrawer::FrameDrawer() {
+    this->font = LoadFont("assets/CommitMonoNerdFont-Regular.otf");
+
     std::vector<std::string> spriteTypes = {"1", "2", "3", "4"};
     std::string level("1");
 
@@ -251,5 +255,12 @@ void FrameDrawer::drawFrame(GameState state) {
                 }
             }
         }
+
+        DrawLine(GRID_FRAME_WIDTH, 0, GRID_FRAME_WIDTH, GRID_FRAME_HEIGHT, WHITE);
+
+        DrawTextEx(this->font, "Lines:", {GRID_FRAME_WIDTH + 10, 10}, 14, 0, WHITE);
+        std::stringstream ss;
+        ss << std::setfill('0') << std::setw(4) << state.linesCleared;
+        DrawTextEx(this->font, ss.str().c_str(), {GRID_FRAME_WIDTH + 10, 22} , 14, 0, WHITE);
     EndDrawing();
 }

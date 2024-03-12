@@ -7,8 +7,8 @@ const int GRID_WIDTH = 10;
 const int GRID_HEIGHT = 20;
 const int BLOCK_SIZE = 12;
 const int GAP_SIZE = 2;
-const int WINDOW_WIDTH = GRID_WIDTH * (BLOCK_SIZE + GAP_SIZE) + GAP_SIZE;
-const int WINDOW_HEIGHT = GRID_HEIGHT * (BLOCK_SIZE + GAP_SIZE) + GAP_SIZE;
+const int GRID_FRAME_WIDTH = GRID_WIDTH * (BLOCK_SIZE + GAP_SIZE) + GAP_SIZE;
+const int GRID_FRAME_HEIGHT = GRID_HEIGHT * (BLOCK_SIZE + GAP_SIZE) + GAP_SIZE;
 
 // For animating line clears.
 // Assumes grid width is even, LEFT_MIDDLE_INDEX is the index along a row to the left of the
