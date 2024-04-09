@@ -65,7 +65,7 @@ Tetronimo Tetronimo::rotate(Rotation rotation) {
 
 GameGrid::GameGrid() {
     for (int i = 0; i < GRID_HEIGHT; i++) {
-        grid.push_back(std::vector<GridCell>(GRID_WIDTH, GridCell(0, true)));
+        grid.push_back(std::vector<GridCell>(GRID_WIDTH, GridCell(none, true)));
     }
 }
 
@@ -73,16 +73,16 @@ bool GameGrid::isEmpty(Position p) {
     return this->grid[p.y][p.x].isEmpty;
 }
 
-int GameGrid::getSpriteType(Position p) {
+SpriteType GameGrid::getSpriteType(Position p) {
     return this->grid[p.y][p.x].spriteType;
 }
 
-void GameGrid::setCell(Position p, int spriteType) {
+void GameGrid::setCell(Position p, SpriteType spriteType) {
     this->grid[p.y][p.x] = GridCell(spriteType, false);
 }
 
 void GameGrid::clearCell(Position p) {
-    this->grid[p.y][p.x] = GridCell(0, true);
+    this->grid[p.y][p.x] = GridCell(none, true);
 }
 
 bool GameGrid::checkCollision(std::vector<Position> positions) {
@@ -123,7 +123,7 @@ void GameGrid::clearRows(std::vector<int> row_indices) {
         this->grid.erase(this->grid.begin() + i);
         this->grid.insert(
             this->grid.begin(), 
-            std::vector<GridCell>(GRID_WIDTH, GridCell(0, true)));
+            std::vector<GridCell>(GRID_WIDTH, GridCell(none, true)));
     }
 }
 
@@ -157,7 +157,9 @@ void GameState::moveTetronimo(Direction direction) {
         Tetronimo tmpTetronimo = this->currentTetronimo.move(down);
         if (this->grid.checkCollision(tmpTetronimo.getPositions())) {
             for (auto p : this->currentTetronimo.getPositions()) {
-                this->grid.setCell(p, spriteMap.at(this->currentTetronimo.shape));
+                this->grid.setCell(
+                    p, 
+                    spriteTypeMap.at(this->currentTetronimo.shape));
             }
             this->isCurrentTetronimoPlaced = true;
             this->linesToClear = this->grid.getFullRows();
@@ -199,18 +201,55 @@ void GameState::nextLineClearStep() {
     }
 }
 
+Sprites::Sprites() {
+    for (auto colors : levelColors) {
+        std::vector<Texture2D> spriteList;
+        spriteList.push_back(this->generateSprite(0, colors.at(0)));
+        spriteList.push_back(this->generateSprite(1, colors.at(0)));
+        spriteList.push_back(this->generateSprite(1, colors.at(1)));
+        this->sprites.push_back(spriteList);
+    }
+}
+
+Texture2D Sprites::generateSprite(int pixelLayoutIndex, Color color) {
+    std::vector<Color> imageData;
+    Texture2D sprite;
+    Image image;
+    for (int pixel : spritePixelLayouts.at(pixelLayoutIndex)) {
+            if (pixel) {
+                imageData.push_back(color);
+            }
+            else {
+                imageData.push_back(WHITE);
+            }
+        }
+    image = {
+        .data = imageData.data(),
+        .width = sprite_width,
+        .height = sprite_height,
+        .format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8,
+        .mipmaps = 1
+    };
+    sprite = LoadTextureFromImage(image);
+    return sprite;
+}
+
+Texture2D Sprites::getSprite(SpriteType spriteType, int level) {
+    return this->sprites.at(level - 1).at(spriteType);
+}
+
 FrameDrawer::FrameDrawer() {
     this->font = LoadFontEx("assets/CommitMonoNerdFont-Regular.otf", 24, NULL, 0);
 
-    std::vector<std::string> spriteTypes = {"1", "2", "3", "4"};
-    std::string level("1");
+    // std::vector<std::string> spriteTypes = {"1", "2", "3"};
+    // std::string level("1");
 
-    std::vector<Texture2D> tmpList;
-    for (auto spriteType : spriteTypes) {
-        std::string filename = "assets/level" + level + "-" + spriteType + ".png";
-        tmpList.push_back(LoadTexture(filename.c_str()));
-    }
-    this->levelTextures.push_back(tmpList);
+    // std::vector<Texture2D> tmpList;
+    // for (auto spriteType : spriteTypes) {
+    //     std::string filename = "assets/level" + level + "-" + spriteType + ".png";
+    //     tmpList.push_back(LoadTexture(filename.c_str()));
+    // }
+    // this->levelTextures.push_back(tmpList);
 }
 
 int FrameDrawer::nextTetronimoXAdjust(Tetronimo tetronimo) {
@@ -223,13 +262,15 @@ int FrameDrawer::nextTetronimoXAdjust(Tetronimo tetronimo) {
     return ret;
 }
 
+
 void FrameDrawer::drawFrame(GameState state) {
     BeginDrawing();
         ClearBackground(BLACK);
         // draw current tetronimo
         if (not state.isCurrentTetrominoPlaced()) {
             Tetronimo tetronimo = state.getCurrentTetronimo();
-            Texture2D sprite = this->levelTextures[0][spriteMap.at(tetronimo.shape) - 1];
+            SpriteType spriteType = spriteTypeMap.at(tetronimo.shape);
+            Texture2D sprite = this->sprites.getSprite(spriteType, state.level);
             for (auto gridPos : tetronimo.getPositions()) {
                 float x = (gridPos.x * BLOCK_SIZE) + (gridPos.x * GAP_SIZE) + GAP_SIZE;
                 float y = (BLOCK_SIZE * gridPos.y) + (gridPos.y * GAP_SIZE) + GAP_SIZE;
@@ -251,7 +292,8 @@ void FrameDrawer::drawFrame(GameState state) {
                 Position gridPos(gridX, gridY);
 
                 if (!grid.isEmpty(gridPos)) {
-                    Texture2D sprite = this->levelTextures[0][grid.getSpriteType(gridPos) - 1];
+                    Texture2D sprite = this->sprites.getSprite(
+                        grid.getSpriteType(gridPos), state.level);
                     float x = (gridPos.x * BLOCK_SIZE) + (gridPos.x * GAP_SIZE) + GAP_SIZE;
                     float y = (BLOCK_SIZE * gridPos.y) + (gridPos.y * GAP_SIZE) + GAP_SIZE;
 
@@ -279,9 +321,10 @@ void FrameDrawer::drawFrame(GameState state) {
         int nextXOffset = GRID_FRAME_WIDTH + 10;
         int nextYOffset = 74;
         Tetronimo tetronimo = state.getNextTetronimo();
+        SpriteType spriteType = spriteTypeMap.at(tetronimo.shape);
+        Texture2D sprite = this->sprites.getSprite(spriteType, state.level);
         auto positions = rotationListMap.at(tetronimo.shape)[0];
         int xAdjust = this->nextTetronimoXAdjust(tetronimo);
-        Texture2D sprite = this->levelTextures[0][spriteMap.at(tetronimo.shape) - 1];
         for (auto pos : positions) {
             float x = nextXOffset + ((pos.x - xAdjust) * BLOCK_SIZE) + ((pos.x - xAdjust) * GAP_SIZE);
             float y = nextYOffset + (BLOCK_SIZE * pos.y) + (pos.y * GAP_SIZE);

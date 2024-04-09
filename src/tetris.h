@@ -12,14 +12,14 @@ enum Rotation { clockwise, counterClockwise };
 enum Direction { down, right, left };
 enum TetronimoShape { l, J, L, O, S, T, Z };
 const int numTetronimoShapes = 6;
+enum SpriteType { first = 0, second = 1, third = 2, none = 4 };
 
-/*
-* Maps a tetronimo shape to a sprite type of which each level has four.
-* The mapped number represents which file the texture comes from.
-* For example, if the game is on level one, tetronimo of shape Z maps to the texture
-* found in level1-3.png since Z maps to integer 3
-*/
-const std::map<TetronimoShape,int> spriteMap = { {T, 1}, {J, 2}, {Z, 3}, {O, 4}, {S, 2}, {L, 3}, {l, 1}}; 
+const std::vector<std::vector<Color>> levelColors = {
+    { BLUE, SKYBLUE }   
+};
+
+const std::map<TetronimoShape,SpriteType> spriteTypeMap = { 
+    {T, first}, {J, second}, {Z, third}, {O, first}, {S, second}, {L, third}, {l, first}}; 
 
 /*
 * Maps each tetronimo shape to a list of initial positions
@@ -72,11 +72,29 @@ const std::map<TetronimoShape, std::vector<std::vector<Position>>> rotationListM
     }}
 };
 
+const int sprite_width = 5;
+const int sprite_height = 5;
+const std::vector<int> sprite1 = {
+    0, 1, 1, 1, 1,
+    1, 0, 0, 0, 1,
+    1, 0, 0, 0, 1,
+    1, 0, 0, 0, 1,
+    1, 1, 1, 1, 1
+};
+const std::vector<int> sprite2 = {
+    0, 1, 1, 1, 1,
+    1, 0, 0, 1, 1, 
+    1, 0, 1, 1, 1,
+    1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1
+};
+const std::vector<std::vector<int>> spritePixelLayouts = { sprite1, sprite2 };
+
 class GridCell {
     public:
-    int spriteType;
+    SpriteType spriteType;
     bool isEmpty;
-    GridCell(int _spriteType, bool _isEmpty): spriteType(_spriteType), isEmpty(_isEmpty) {}
+    GridCell(SpriteType _spriteType, bool _isEmpty): spriteType(_spriteType), isEmpty(_isEmpty) {}
 };
 
 class Tetronimo {
@@ -104,8 +122,8 @@ class GameGrid {
     public:
     GameGrid();
     bool isEmpty(Position p);
-    int getSpriteType(Position p); // returns a number between 1-4, or 0 if the cell is empty
-    void setCell(Position p, int spriteType);
+    SpriteType getSpriteType(Position p); 
+    void setCell(Position p, SpriteType spriteType);
     void clearCell(Position p);
     bool checkCollision(std::vector<Position> positions);
     std::vector<int> getFullRows();
@@ -133,6 +151,7 @@ class GameState {
 
     public:
     int linesCleared = 0;
+    int level = 1;
 
     GameState();
     GameGrid getGrid();
@@ -168,11 +187,25 @@ class GameState {
 };
 
 
+class Sprites {
+    private:
+    std::vector<std::vector<Texture2D>> sprites;
+
+    private:
+    Texture2D generateSprite(int pixelLayoutIndex, Color colour);
+
+    public:
+    Sprites();
+    Texture2D getSprite(SpriteType spriteType, int level);
+};
+
+
 class FrameDrawer {
     private:
-    std::vector<std::vector<Texture2D>> levelTextures;
     Font font;
+    Sprites sprites;
 
+    private:
     /*
     * The rotation list positions are hardcoded to center a new tetronimo in the game grid.
     * This function calculates how much to remove from the x-values of all the positions to 
