@@ -15,7 +15,8 @@ const int numTetronimoShapes = 6;
 enum SpriteType { first = 0, second = 1, third = 2, none = 4 };
 
 const std::vector<std::vector<Color>> levelColors = {
-    { BLUE, SKYBLUE }   
+    { BLUE, SKYBLUE },
+    { GREEN, LIME }
 };
 
 const std::map<TetronimoShape,SpriteType> spriteTypeMap = { 
@@ -74,21 +75,21 @@ const std::map<TetronimoShape, std::vector<std::vector<Position>>> rotationListM
 
 const int sprite_width = 5;
 const int sprite_height = 5;
-const std::vector<int> sprite1 = {
+const std::vector<int> spritePixelLayout1 = {
     0, 1, 1, 1, 1,
     1, 0, 0, 0, 1,
     1, 0, 0, 0, 1,
     1, 0, 0, 0, 1,
     1, 1, 1, 1, 1
 };
-const std::vector<int> sprite2 = {
+const std::vector<int> spritePixelLayout2 = {
     0, 1, 1, 1, 1,
     1, 0, 0, 1, 1, 
     1, 0, 1, 1, 1,
     1, 1, 1, 1, 1,
     1, 1, 1, 1, 1
 };
-const std::vector<std::vector<int>> spritePixelLayouts = { sprite1, sprite2 };
+const std::vector<std::vector<int>> spritePixelLayouts = { spritePixelLayout1, spritePixelLayout2 };
 
 class GridCell {
     public:
@@ -113,6 +114,7 @@ class Tetronimo {
     std::vector<Position> getPositions();
     Tetronimo move(Direction direction);
     Tetronimo rotate(Rotation rotation);
+    SpriteType getSpriteType();
 };
 
 class GameGrid {
@@ -211,7 +213,10 @@ class FrameDrawer {
     * This function calculates how much to remove from the x-values of all the positions to 
     * undo that centering. Basically it returns the minimum x-value of all the tetronimos positions.
     */
-    int nextTetronimoXAdjust(Tetronimo tetronimo);
+    int getHorizontalOffset(Tetronimo tetronimo);
+    void drawCurrentTetronimo(GameState& state);
+    void drawGridCells(GameState& state);
+    void drawSideBar(GameState& state);
 
     public:
     FrameDrawer(); // loads all the sprite textures into levelTextures

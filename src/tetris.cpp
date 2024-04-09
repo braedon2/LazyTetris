@@ -59,6 +59,10 @@ Tetronimo Tetronimo::rotate(Rotation rotation) {
     return Tetronimo(this->shape, this->xDelta, this->yDelta, rotationStep);
 }
 
+SpriteType Tetronimo::getSpriteType() {
+    return spriteTypeMap.at(this->shape);
+}
+
 /**********
  * GameGrid
  **********/
@@ -159,7 +163,7 @@ void GameState::moveTetronimo(Direction direction) {
             for (auto p : this->currentTetronimo.getPositions()) {
                 this->grid.setCell(
                     p, 
-                    spriteTypeMap.at(this->currentTetronimo.shape));
+                    this->currentTetronimo.getSpriteType());
             }
             this->isCurrentTetronimoPlaced = true;
             this->linesToClear = this->grid.getFullRows();
@@ -240,19 +244,9 @@ Texture2D Sprites::getSprite(SpriteType spriteType, int level) {
 
 FrameDrawer::FrameDrawer() {
     this->font = LoadFontEx("assets/CommitMonoNerdFont-Regular.otf", 24, NULL, 0);
-
-    // std::vector<std::string> spriteTypes = {"1", "2", "3"};
-    // std::string level("1");
-
-    // std::vector<Texture2D> tmpList;
-    // for (auto spriteType : spriteTypes) {
-    //     std::string filename = "assets/level" + level + "-" + spriteType + ".png";
-    //     tmpList.push_back(LoadTexture(filename.c_str()));
-    // }
-    // this->levelTextures.push_back(tmpList);
 }
 
-int FrameDrawer::nextTetronimoXAdjust(Tetronimo tetronimo) {
+int FrameDrawer::getHorizontalOffset(Tetronimo tetronimo) {
     int ret = 10; // arbitrary large number
     for (auto pos : tetronimo.getPositions()) {
         if (pos.x < ret) {
@@ -262,18 +256,38 @@ int FrameDrawer::nextTetronimoXAdjust(Tetronimo tetronimo) {
     return ret;
 }
 
+void FrameDrawer::drawCurrentTetronimo(GameState& state) {
+    if (not state.isCurrentTetrominoPlaced()) {
+        Tetronimo tetronimo = state.getCurrentTetronimo();
+        SpriteType spriteType = tetronimo.getSpriteType();
+        Texture2D sprite = this->sprites.getSprite(spriteType, state.level);
+        for (auto gridPos : tetronimo.getPositions()) {
+            float x = (gridPos.x * BLOCK_SIZE) + (gridPos.x * GAP_SIZE) + GAP_SIZE;
+            float y = (BLOCK_SIZE * gridPos.y) + (gridPos.y * GAP_SIZE) + GAP_SIZE;
+            DrawTexturePro(
+                sprite,
+                { 0.0f, 0.0f, (float)sprite.width, (float)sprite.height },
+                { x, y, (float)BLOCK_SIZE, (float)BLOCK_SIZE},
+                { 0.0f, 0.0f },
+                0.0f,
+                WHITE
+            );
+        }
+    }
+}
 
-void FrameDrawer::drawFrame(GameState state) {
-    BeginDrawing();
-        ClearBackground(BLACK);
-        // draw current tetronimo
-        if (not state.isCurrentTetrominoPlaced()) {
-            Tetronimo tetronimo = state.getCurrentTetronimo();
-            SpriteType spriteType = spriteTypeMap.at(tetronimo.shape);
-            Texture2D sprite = this->sprites.getSprite(spriteType, state.level);
-            for (auto gridPos : tetronimo.getPositions()) {
+void FrameDrawer::drawGridCells(GameState& state) {
+    GameGrid grid = state.getGrid();
+    for (int gridX = 0; gridX < GRID_WIDTH; gridX++) {
+        for (int gridY = 0; gridY < GRID_HEIGHT; gridY++) {
+            Position gridPos(gridX, gridY);
+
+            if (!grid.isEmpty(gridPos)) {
+                Texture2D sprite = this->sprites.getSprite(
+                    grid.getSpriteType(gridPos), state.level);
                 float x = (gridPos.x * BLOCK_SIZE) + (gridPos.x * GAP_SIZE) + GAP_SIZE;
                 float y = (BLOCK_SIZE * gridPos.y) + (gridPos.y * GAP_SIZE) + GAP_SIZE;
+
                 DrawTexturePro(
                     sprite,
                     { 0.0f, 0.0f, (float)sprite.width, (float)sprite.height },
@@ -284,58 +298,56 @@ void FrameDrawer::drawFrame(GameState state) {
                 );
             }
         }
+    }
+}
 
-        // draw grid cells
-        GameGrid grid = state.getGrid();
-        for (int gridX = 0; gridX < GRID_WIDTH; gridX++) {
-            for (int gridY = 0; gridY < GRID_HEIGHT; gridY++) {
-                Position gridPos(gridX, gridY);
+void FrameDrawer::drawSideBar(GameState& state) {
+    float yStart = 10;
 
-                if (!grid.isEmpty(gridPos)) {
-                    Texture2D sprite = this->sprites.getSprite(
-                        grid.getSpriteType(gridPos), state.level);
-                    float x = (gridPos.x * BLOCK_SIZE) + (gridPos.x * GAP_SIZE) + GAP_SIZE;
-                    float y = (BLOCK_SIZE * gridPos.y) + (gridPos.y * GAP_SIZE) + GAP_SIZE;
+    DrawLine(GRID_FRAME_WIDTH, 0, GRID_FRAME_WIDTH, GRID_FRAME_HEIGHT, WHITE);
 
-                    DrawTexturePro(
-                        sprite,
-                        { 0.0f, 0.0f, (float)sprite.width, (float)sprite.height },
-                        { x, y, (float)BLOCK_SIZE, (float)BLOCK_SIZE},
-                        { 0.0f, 0.0f },
-                        0.0f,
-                        WHITE
-                    );
-                }
-            }
-        }
+    // draw level in side bar
+    DrawTextEx(this->font, "Level:", {GRID_FRAME_WIDTH + 10, yStart}, 12, 0, WHITE);
+    std::stringstream ss1;
+    ss1 << std::setfill('0') << std::setw(4) << state.level;
+    DrawTextEx(this->font, ss1.str().c_str(), {GRID_FRAME_WIDTH + 10, yStart + 12} , 12, 0, WHITE);
 
-        DrawLine(GRID_FRAME_WIDTH, 0, GRID_FRAME_WIDTH, GRID_FRAME_HEIGHT, WHITE);
+    yStart += 44;
 
-        DrawTextEx(this->font, "Lines:", {GRID_FRAME_WIDTH + 10, 10}, 12, 0, WHITE);
-        std::stringstream ss;
-        ss << std::setfill('0') << std::setw(4) << state.linesCleared;
-        DrawTextEx(this->font, ss.str().c_str(), {GRID_FRAME_WIDTH + 10, 24} , 12, 0, WHITE);
+    // draw number of line clears in side bar
+    DrawTextEx(this->font, "Lines:", {GRID_FRAME_WIDTH + 10, yStart}, 12, 0, WHITE);
+    std::stringstream ss2;
+    ss2 << std::setfill('0') << std::setw(4) << state.linesCleared;
+    DrawTextEx(this->font, ss2.str().c_str(), {GRID_FRAME_WIDTH + 10, yStart + 12} , 12, 0, WHITE);
 
-        // draw next tetronimo
-        DrawTextEx(this->font, "Next:", {GRID_FRAME_WIDTH + 10, 56}, 12, 0, WHITE);
-        int nextXOffset = GRID_FRAME_WIDTH + 10;
-        int nextYOffset = 74;
-        Tetronimo tetronimo = state.getNextTetronimo();
-        SpriteType spriteType = spriteTypeMap.at(tetronimo.shape);
-        Texture2D sprite = this->sprites.getSprite(spriteType, state.level);
-        auto positions = rotationListMap.at(tetronimo.shape)[0];
-        int xAdjust = this->nextTetronimoXAdjust(tetronimo);
-        for (auto pos : positions) {
-            float x = nextXOffset + ((pos.x - xAdjust) * BLOCK_SIZE) + ((pos.x - xAdjust) * GAP_SIZE);
-            float y = nextYOffset + (BLOCK_SIZE * pos.y) + (pos.y * GAP_SIZE);
-            DrawTexturePro(
-                sprite,
-                { 0.0f, 0.0f, (float)sprite.width, (float)sprite.height },
-                { x, y, (float)BLOCK_SIZE, (float)BLOCK_SIZE},
-                { 0.0f, 0.0f },
-                0.0f,
-                WHITE
-            );
-        }
+    yStart += 44;
+
+    // draw next tetronimo in side bar
+    DrawTextEx(this->font, "Next:", {GRID_FRAME_WIDTH + 10, yStart}, 12, 0, WHITE);
+    Tetronimo tetronimo = state.getNextTetronimo();
+    SpriteType spriteType = spriteTypeMap.at(tetronimo.shape);
+    Texture2D sprite = this->sprites.getSprite(spriteType, state.level);
+    auto positions = rotationListMap.at(tetronimo.shape)[0];
+    int xAdjust = this->getHorizontalOffset(tetronimo);
+    for (auto pos : positions) {
+        float x = GRID_FRAME_WIDTH + 10 + ((pos.x - xAdjust) * BLOCK_SIZE) + ((pos.x - xAdjust) * GAP_SIZE);
+        float y = yStart + 18 + (BLOCK_SIZE * pos.y) + (pos.y * GAP_SIZE);
+        DrawTexturePro(
+            sprite,
+            { 0.0f, 0.0f, (float)sprite.width, (float)sprite.height },
+            { x, y, (float)BLOCK_SIZE, (float)BLOCK_SIZE},
+            { 0.0f, 0.0f },
+            0.0f,
+            WHITE
+        );
+    }
+}
+
+void FrameDrawer::drawFrame(GameState state) {
+    BeginDrawing();
+        ClearBackground(BLACK);
+        this->drawCurrentTetronimo(state);
+        this->drawGridCells(state);
+        this->drawSideBar(state);
     EndDrawing();
 }
