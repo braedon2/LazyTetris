@@ -23,6 +23,6 @@ const int FRAMES_PER_SOFT_DROP = 1; // falling speed down down arrow key is pres
 const int FRAMES_PER_TETRONIMO_RESET = 5; // frames between tetronimo being placed and a new one initializing
 const int FRAMES_PER_LINE_CLEAR = 2; // speed of the line clearing animation
 
-const int LINE_CLEARS_PER_LEVEL = 1;
+const int LINE_CLEARS_PER_LEVEL = 5;
 
 #endif

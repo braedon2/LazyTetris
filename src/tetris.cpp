@@ -197,7 +197,14 @@ void GameState::nextLineClearStep() {
         this->grid.clearCell(Position(RIGHT_MIDDLE_INDEX + this->lineClearStep, lineIndex));
     }
     this->lineClearStep++;
+
+    // update a bunch of state after the line clear is finished
     if (this->lineClearStep == GRID_WIDTH / 2) {
+        // update level if enough lines have been cleared
+        if (this->linesCleared + this->linesToClear.size() >= this->level * LINE_CLEARS_PER_LEVEL) {
+            this->level++;
+        }
+
         this->linesCleared += this->linesToClear.size();
         this->grid.clearRows(this->linesToClear);
         this->lineClearStep = 0;
@@ -239,7 +246,7 @@ Texture2D Sprites::generateSprite(int pixelLayoutIndex, Color color) {
 }
 
 Texture2D Sprites::getSprite(SpriteType spriteType, int level) {
-    return this->sprites.at(level - 1).at(spriteType);
+    return this->sprites.at((level - 1) % this->sprites.size()).at(spriteType);
 }
 
 FrameDrawer::FrameDrawer() {
