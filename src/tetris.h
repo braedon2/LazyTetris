@@ -162,6 +162,7 @@ class GameState {
     public:
     int linesCleared = 0;
     int level = 1;
+    bool gameOver = false;
 
     GameState();
     GameGrid getGrid();
@@ -214,6 +215,7 @@ class FrameDrawer {
     private:
     Font font;
     Sprites sprites;
+    int gameOverStep = 0;
 
     private:
     /*
@@ -225,10 +227,12 @@ class FrameDrawer {
     void drawCurrentTetronimo(GameState& state);
     void drawGridCells(GameState& state);
     void drawSideBar(GameState& state);
+    void drawGameOver(int level);
 
     public:
     FrameDrawer(); 
-    void drawFrame(GameState state);
+    void drawFrame(GameState& state);
+    void nextGameOverStep();
 };
 
 #endif

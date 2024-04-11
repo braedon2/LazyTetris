@@ -23,7 +23,8 @@ int main(void) {
     
     bool disableKeyDown = false;
 
-    while (!WindowShouldClose()) {
+    // main gameplay loop
+    while (!WindowShouldClose() and !state.gameOver) {
         frameCounter.nextFrame();
 
         if (IsKeyPressed(KEY_RIGHT)) {
@@ -66,6 +67,19 @@ int main(void) {
 
         if (state.isCurrentTetrominoPlaced() and frameCounter.framesPerTetronimoResetCounter >= FRAMES_PER_TETRONIMO_RESET) {
             state.initNewTetronimo();
+            frameCounter.resetCounters();
+        }
+
+        frameDrawer.drawFrame(state);
+    }
+
+    std::cout << "Game Over" << std::endl;
+
+    // game over animation
+    while (!WindowShouldClose()) {
+        frameCounter.nextFrame();
+        if (frameCounter.framesPerGameOverStepCounter >= FRAMES_PER_GAME_OVER_STEP) {
+            frameDrawer.nextGameOverStep();
             frameCounter.resetCounters();
         }
 

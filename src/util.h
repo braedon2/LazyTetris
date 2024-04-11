@@ -14,6 +14,7 @@ class FrameCounter {
     int framesPerSoftDropCounter = 0;
     int framesPerTetronimoResetCounter = 0;
     int framesPerLineClearCounter = 0;
+    int framesPerGameOverStepCounter = 0;
 
     void nextFrame();
     void resetCounters();

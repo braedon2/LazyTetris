@@ -22,7 +22,8 @@ const int FRAMES_PER_GRID_CELL = 24; // speed at which the tetronimo falls taken
 const int FRAMES_PER_SOFT_DROP = 1; // falling speed down down arrow key is pressed
 const int FRAMES_PER_TETRONIMO_RESET = 5; // frames between tetronimo being placed and a new one initializing
 const int FRAMES_PER_LINE_CLEAR = 2; // speed of the line clearing animation
+const int FRAMES_PER_GAME_OVER_STEP = 3;
 
-const int LINE_CLEARS_PER_LEVEL = 5;
+const int LINE_CLEARS_PER_LEVEL = 10;
 
 #endif

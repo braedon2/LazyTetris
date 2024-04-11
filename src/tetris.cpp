@@ -149,6 +149,10 @@ void GameState::initNewTetronimo() {
     this->currentTetronimo = this->nextTetronimo;
     this->nextTetronimo = Tetronimo(static_cast<TetronimoShape>(rand() % numTetronimoShapes)); 
     this->isCurrentTetronimoPlaced = false;
+
+    if (this->grid.checkCollision(this->currentTetronimo.getPositions())) {
+        this->gameOver = true;
+    }
 }
 
 void GameState::moveTetronimo(Direction direction) {
@@ -350,11 +354,38 @@ void FrameDrawer::drawSideBar(GameState& state) {
     }
 }
 
-void FrameDrawer::drawFrame(GameState state) {
+void FrameDrawer::drawGameOver(int level) {
+    Color color1 = levelColors.at((level - 1) % levelColors.size()).at(0);
+    Color color2 = levelColors.at((level - 1) % levelColors.size()).at(1);
+
+    for (int i = 0; i < this->gameOverStep; i++) {
+        int y1 = (i * BLOCK_SIZE) + (i * GAP_SIZE);
+        int y2 = y1 + 3;
+        int y3 = y1 + BLOCK_SIZE - 3;
+        int y4 = y3 + GAP_SIZE;
+
+        DrawRectangle(0, y1, GRID_FRAME_WIDTH, 3, color1);
+        DrawRectangle(0, y2, GRID_FRAME_WIDTH, BLOCK_SIZE - 6, WHITE);
+        DrawRectangle(0, y3, GRID_FRAME_WIDTH, 3, color2);
+        DrawRectangle(0, y4, GRID_FRAME_WIDTH, 3, BLACK);
+    }
+}
+
+void FrameDrawer::drawFrame(GameState& state) {
     BeginDrawing();
         ClearBackground(BLACK);
         this->drawCurrentTetronimo(state);
         this->drawGridCells(state);
         this->drawSideBar(state);
+
+        if (state.gameOver) {
+            this->drawGameOver(state.level);
+        }
     EndDrawing();
+}
+
+void FrameDrawer::nextGameOverStep() {
+    if (this->gameOverStep < GRID_HEIGHT) {
+        this->gameOverStep++;
+    }
 }

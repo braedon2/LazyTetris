@@ -5,6 +5,7 @@ void FrameCounter::nextFrame() {
     this->framesPerSoftDropCounter++;
     this->framesPerTetronimoResetCounter++;
     this->framesPerLineClearCounter++;
+    this->framesPerGameOverStepCounter++;
 }
 
 void FrameCounter::resetCounters() {
@@ -12,4 +13,5 @@ void FrameCounter::resetCounters() {
     this->framesPerSoftDropCounter = 0;
     this->framesPerTetronimoResetCounter = 0;
     this->framesPerLineClearCounter = 0;
+    this->framesPerGameOverStepCounter = 0;
 }
