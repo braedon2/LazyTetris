@@ -17,18 +17,25 @@ enum SpriteType { first = 0, second = 1, third = 2, none = 4 };
 const std::vector<std::vector<Color>> levelColors = {
     { BLUE, SKYBLUE },
     { LIME, GREEN },
-    { {216,0,204,255}, {248,120,248,255} },
-    { {0,88,248,255}, {0,184,0,255} },
-    { {228,0,88,255}, {88,248,152,255} },
+    { {216,0,204,255},  {248,120,248,255} },
+    { {0,88,248,255},   {0,184,0,255} },
+    { {228,0,88,255},   {88,248,152,255} },
     { {88,248,152,255}, {104,136,252,255} },
-    { {248,56,0,255}, {124,124,124,255} },
+    { {248,56,0,255},   {124,124,124,255} },
     { {104,68,252,255}, {168,0,32,255} },
-    { {0,88,248,255}, {248,56,0,255} },
-    { {248,56,0,255}, {252,160,68,255} },
+    { {0,88,248,255},   {248,56,0,255} },
+    { {248,56,0,255},   {252,160,68,255} },
 };
 
 const std::map<TetronimoShape,SpriteType> spriteTypeMap = { 
-    {T, first}, {J, second}, {Z, third}, {O, first}, {S, second}, {L, third}, {l, first}}; 
+    {T, first}, 
+    {J, second}, 
+    {Z, third}, 
+    {O, first}, 
+    {S, second}, 
+    {L, third}, 
+    {l, first}
+}; 
 
 /*
 * Maps each tetronimo shape to a list of initial positions
@@ -108,7 +115,6 @@ class GridCell {
 
 class Tetronimo {
     private:
-    
     std::vector<std::vector<Position>> rotationList;
     int xDelta;
     int yDelta;
@@ -164,6 +170,7 @@ class GameState {
     int level = 1;
     bool gameOver = false;
 
+    public:
     GameState();
     GameGrid getGrid();
     Tetronimo getCurrentTetronimo();

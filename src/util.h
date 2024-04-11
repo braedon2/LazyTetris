@@ -3,9 +3,9 @@
 
 class Position {
     public:
-        int x;
-        int y;
-        Position(int _x, int _y): x(_x), y(_y) {}
+    int x;
+    int y;
+    Position(int _x, int _y): x(_x), y(_y) {}
 };
 
 class FrameCounter {
