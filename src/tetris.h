@@ -2,11 +2,15 @@
 #define TETRIS_H
 
 #include <vector>
-
 #include "raylib.h"
-
-#include "util.h"
 #include "constants.h"
+
+class Position {
+    public:
+    int x;
+    int y;
+    Position(int _x, int _y): x(_x), y(_y) {}
+};
 
 enum Rotation { clockwise, counterClockwise };
 enum Direction { down, right, left };
@@ -217,7 +221,6 @@ class Sprites {
     Texture2D getSprite(SpriteType spriteType, int level);
 };
 
-
 class FrameDrawer {
     private:
     Font font;
@@ -240,6 +243,18 @@ class FrameDrawer {
     FrameDrawer(); 
     void drawFrame(GameState& state);
     void nextGameOverStep();
+};
+
+class FrameCounter {
+    public:
+    int framesPerGridCellCounter = 0;
+    int framesPerSoftDropCounter = 0;
+    int framesPerTetronimoResetCounter = 0;
+    int framesPerLineClearCounter = 0;
+    int framesPerGameOverStepCounter = 0;
+
+    void nextFrame();
+    void resetCounters();
 };
 
 #endif

@@ -6,7 +6,6 @@
 #include <raylib.h>
 #include <raymath.h>
 
-#include "util.h"
 #include "constants.h"
 #include "tetris.h"
 
