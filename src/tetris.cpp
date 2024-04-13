@@ -137,6 +137,8 @@ void GameGrid::clearRows(std::vector<int> row_indices) {
 
 GameState::GameState() {
     this->currentTetronimo = Tetronimo(static_cast<TetronimoShape>(rand() % numTetronimoShapes)); 
+    this->currentTetronimo.xDelta = SPAWN_X_DELTA;
+
     this->nextTetronimo = Tetronimo(static_cast<TetronimoShape>(rand() % numTetronimoShapes));
 }
 
@@ -147,6 +149,8 @@ bool GameState::isCurrentTetrominoPlaced() { return this->isCurrentTetronimoPlac
 
 void GameState::initNewTetronimo() { 
     this->currentTetronimo = this->nextTetronimo;
+    this->currentTetronimo.xDelta = SPAWN_X_DELTA;
+
     this->nextTetronimo = Tetronimo(static_cast<TetronimoShape>(rand() % numTetronimoShapes)); 
     this->isCurrentTetronimoPlaced = false;
 
@@ -264,7 +268,7 @@ int FrameDrawer::getHorizontalOffset(Tetronimo tetronimo) {
             ret = pos.x;
         }
     }
-    return ret;
+    return -ret;
 }
 
 void FrameDrawer::drawCurrentTetronimo(GameState& state) {
@@ -341,7 +345,7 @@ void FrameDrawer::drawSideBar(GameState& state) {
     auto positions = rotationListMap.at(tetronimo.shape)[0];
     int xAdjust = this->getHorizontalOffset(tetronimo);
     for (auto pos : positions) {
-        float x = GRID_FRAME_WIDTH + 10 + ((pos.x - xAdjust) * BLOCK_SIZE) + ((pos.x - xAdjust) * GAP_SIZE);
+        float x = GRID_FRAME_WIDTH + 10 + ((pos.x + xAdjust) * BLOCK_SIZE) + ((pos.x + xAdjust) * GAP_SIZE);
         float y = yStart + 18 + (BLOCK_SIZE * pos.y) + (pos.y * GAP_SIZE);
         DrawTexturePro(
             sprite,

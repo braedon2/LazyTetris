@@ -3,12 +3,15 @@
 
 #include <map>
 
-const int GRID_WIDTH = 10;
+const int GRID_WIDTH = 10; // width in blocks
 const int GRID_HEIGHT = 20;
 const int BLOCK_SIZE = 12;
 const int GAP_SIZE = 2;
-const int GRID_FRAME_WIDTH = GRID_WIDTH * (BLOCK_SIZE + GAP_SIZE) + GAP_SIZE;
+const int GRID_FRAME_WIDTH = GRID_WIDTH * (BLOCK_SIZE + GAP_SIZE) + GAP_SIZE; // width in pixels
 const int GRID_FRAME_HEIGHT = GRID_HEIGHT * (BLOCK_SIZE + GAP_SIZE) + GAP_SIZE;
+
+// x delta to apply to a newly spawned tetronimo
+const int SPAWN_X_DELTA = 5;
 
 // For animating line clears.
 // Assumes grid width is even, LEFT_MIDDLE_INDEX is the index along a row to the left of the

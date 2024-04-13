@@ -14,10 +14,82 @@ class Position {
 
 enum Rotation { clockwise, counterClockwise };
 enum Direction { down, right, left };
+
+/// used as a key to map a tetromino shape to data that relates to it
 enum TetronimoShape { l, J, L, O, S, T, Z };
 const int numTetronimoShapes = 6;
+
+/// There are three sprite variants for each level
+/// A GridCell instance stores a spriteType instead of the sprite itself.
+/// A Tetromino instance can return its associated SpriteType.
+/// The SpriteType value is used as an index when selecting a sprite for 
+/// a given level. 
+/// The none value is used for empty GridCells and is never passed to the 
+/// Sprites class for retrieving a sprite.
 enum SpriteType { first = 0, second = 1, third = 2, none = 4 };
 
+/// Each tetronimo shape is associated with a SpriteType
+/// the Tetromino class uses this when its getSpriteType() is called
+const std::map<TetronimoShape,SpriteType> spriteTypeMap = { 
+    {T, first}, 
+    {J, second}, 
+    {Z, third}, 
+    {O, first}, 
+    {S, second}, 
+    {L, third}, 
+    {l, first}
+}; 
+
+/// The first item of each rotation list is the initial orientation for a newly spawned tetronimo of
+/// that shape. The next list of positions for a shape are the positions of the tetronimo if it were
+/// rotated clockwise.
+///
+/// For example:
+/// The first item in the rotation list for tetronimo shape T looks like
+///  000
+///   0
+/// The second item in the rotation list is the previous representation rotated 90 degrees clockwise
+///   0
+///  00
+///   0
+const std::map<TetronimoShape, std::vector<std::vector<Position>>> rotationListMap = {
+    { T, { 
+        {{-1,0}, {0,0}, {1,0}, {0,1}},
+        {{0,-1}, {-1,0}, {0,0}, {0,1}},
+        {{0,-1}, {-1,0}, {0,0}, {1,0}},
+        {{0,-1}, {0,0}, {1,0}, {0,1}}
+    }},
+    { l, {
+        {{-2,0}, {-1,0}, {0,0}, {1,0}},
+        {{0,-2}, {0,-1}, {0,0}, {0,1}}
+    }},
+    { O, {
+        {{-1,0}, {0,0}, {-1,1}, {0,1}}
+    }},
+    {J, {
+        {{-1,0}, {0,0}, {1,0}, {1,1}},
+        {{0,-1}, {0,0}, {-1,1}, {0,1}},
+        {{-1,-1}, {-1,0}, {0,0}, {1,0}},
+        {{0,-1}, {1,-1}, {0,0}, {0,1}}
+    }},
+    {L, {
+        {{-1,0}, {0,0}, {1,0}, {-1,1}},
+        {{-1,-1}, {0,-1}, {0,0}, {0,1}},
+        {{1,-1}, {-1,0}, {0,0}, {1,0}},
+        {{0,-1}, {0,0}, {0,1}, {1,1}}
+    }},
+    {S, {
+        {{0,0}, {1,0}, {-1,1}, {0,1}},
+        {{0,-1}, {0,0}, {1,0}, {1,1}}
+    }},
+    {Z, {
+        {{-1,0}, {0,0}, {0,1}, {1,1}},
+        {{1,-1}, {0,0}, {1,0}, {0,1}}
+    }}
+};
+
+/// used by the Sprites class when generating sprites.
+/// each level has two colors.
 const std::vector<std::vector<Color>> levelColors = {
     { BLUE, SKYBLUE },
     { LIME, GREEN },
@@ -31,67 +103,9 @@ const std::vector<std::vector<Color>> levelColors = {
     { {248,56,0,255},   {252,160,68,255} },
 };
 
-const std::map<TetronimoShape,SpriteType> spriteTypeMap = { 
-    {T, first}, 
-    {J, second}, 
-    {Z, third}, 
-    {O, first}, 
-    {S, second}, 
-    {L, third}, 
-    {l, first}
-}; 
-
-/*
-* Maps each tetronimo shape to a list of initial positions
-* The first item of each rotation list is the initial position for a newly spawned tetronimo of 
-* that shape. The next list of positions for a shape are the positions of the tetronimo if it were
-* rotated clockwise. 
-*
-* For example:
-* The first item in the rotation list for tetronimo shape T looks like
-*  000
-*   0
-* The second item in the rotation list is the previous representation rotated 90 degrees clockwise
-*   0
-*  00
-*   0
-*/
-const std::map<TetronimoShape, std::vector<std::vector<Position>>> rotationListMap = {
-    { T, { 
-        {{4,0}, {5,0}, {6,0}, {5,1}},
-        {{5,-1}, {4,0}, {5,0}, {5,1}},
-        {{5,-1}, {4,0}, {5,0}, {6,0}},
-        {{5,-1}, {5,0}, {6,0}, {5,1}}
-    }},
-    { l, {
-        {{3,0}, {4,0}, {5,0}, {6,0}},
-        {{5,-2}, {5,-1}, {5,0}, {5,1}}
-    }},
-    { O, {
-        {{4,0}, {5,0}, {4,1}, {5,1}}
-    }},
-    {J, {
-        {{4,0}, {5,0}, {6,0}, {6,1}},
-        {{5,-1}, {5,0}, {4,1}, {5,1}},
-        {{4,-1}, {4,0}, {5,0}, {6,0}},
-        {{5,-1}, {6,-1}, {5,0}, {5,1}}
-    }},
-    {L, {
-        {{4,0}, {5,0}, {6,0}, {4,1}},
-        {{4,-1}, {5,-1}, {5,0}, {5,1}},
-        {{6,-1}, {4,0}, {5,0}, {6,0}},
-        {{5,-1}, {5,0}, {5,1}, {6,1}}
-    }},
-    {S, {
-        {{5,0}, {6,0}, {4,1}, {5,1}},
-        {{5,-1}, {5,0}, {6,0}, {6,1}}
-    }},
-    {Z, {
-        {{4,0}, {5,0}, {5,1}, {6,1}},
-        {{6,-1}, {5,0}, {6,0}, {5,1}}
-    }}
-};
-
+/// The flat lists of integers are used by the Sprites class when generating sprites.
+/// 1 means to color the sprite using levelColors.
+/// 0 means to color the pixel white.
 const int sprite_width = 5;
 const int sprite_height = 5;
 const std::vector<int> spritePixelLayout1 = {
@@ -110,6 +124,8 @@ const std::vector<int> spritePixelLayout2 = {
 };
 const std::vector<std::vector<int>> spritePixelLayouts = { spritePixelLayout1, spritePixelLayout2 };
 
+/// When a tetromino is locked into place it is stored as GridCells in the State class.
+/// The game starts with a board of empty GridCells.
 class GridCell {
     public:
     SpriteType spriteType;
@@ -117,18 +133,21 @@ class GridCell {
     GridCell(SpriteType _spriteType, bool _isEmpty): spriteType(_spriteType), isEmpty(_isEmpty) {}
 };
 
+/// A collection of Positions that can be translated or rotated.
+/// When a Tetronimo is moved or rotated a new Tetronimo object is created
+/// instead of mutating the original. This makes it easier to test a change 
+/// for a collision before commiting to it
 class Tetronimo {
-    private:
+    public:
     std::vector<std::vector<Position>> rotationList;
     int xDelta;
     int yDelta;
     int rotationStep;
+    TetronimoShape shape;
 
     public:
-    TetronimoShape shape;
     Tetronimo(TetronimoShape shape);
     Tetronimo(TetronimoShape shape, int xDelta, int yDelta, int rotationStep);
-
     std::vector<Position> getPositions();
     Tetronimo move(Direction direction);
     Tetronimo rotate(Rotation rotation);
@@ -228,11 +247,6 @@ class FrameDrawer {
     int gameOverStep = 0;
 
     private:
-    /*
-    * The rotation list positions are hardcoded to center a new tetronimo in the game grid.
-    * This function calculates how much to remove from the x-values of all the positions to 
-    * undo that centering. Basically it returns the minimum x-value of all the tetronimos positions.
-    */
     int getHorizontalOffset(Tetronimo tetronimo);
     void drawCurrentTetronimo(GameState& state);
     void drawGridCells(GameState& state);
