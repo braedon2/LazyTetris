@@ -50,8 +50,10 @@ int main(void) {
         }
 
         if (frameCounter.framesPerGridCellCounter >= FRAMES_PER_GRID_CELL) {
-            state.moveTetronimo(down);
-            frameCounter.resetCounters();
+            if (not state.isCurrentTetrominoPlaced()) {
+                state.moveTetronimo(down);
+                frameCounter.resetCounters();
+            }
         }
 
         if (state.isLineClearInProgress()) {
