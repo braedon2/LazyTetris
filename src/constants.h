@@ -21,7 +21,7 @@ const int LEFT_MIDDLE_INDEX = (GRID_WIDTH / 2) - 1;
 const int RIGHT_MIDDLE_INDEX = GRID_WIDTH / 2;
 
 // frame counters for controlling the speed of animations
-const int FRAMES_PER_GRID_CELL = 24; // speed at which the tetronimo falls taken from https://tetris.fandom.com/wiki/Tetris_(NES,_Nintendo)
+const int FRAMES_PER_GRID_CELL = 5; // speed at which the tetronimo falls
 const int FRAMES_PER_SOFT_DROP = 1; // falling speed down down arrow key is pressed
 const int FRAMES_PER_TETRONIMO_RESET = 5; // frames between tetronimo being placed and a new one initializing
 const int FRAMES_PER_LINE_CLEAR = 2; // speed of the line clearing animation

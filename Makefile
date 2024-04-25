@@ -7,3 +7,5 @@ CPPFILES = src/*.cpp
 build_osx_debug: 
 	$(COMPILER) -g $(CPPFILES) $(SOURCE_LIBS) $(OSX_OUT) $(OSX_OPT)
 	
+build_playground_osx:
+	$(COMPILER) -g src/tetris.cpp src/solver.cpp src/solver-playground/main.cpp $(SOURCE_LIBS) -o bin/playground_osx $(OSX_OPT)
