@@ -77,5 +77,6 @@
         "memory_resource": "cpp",
         "thread": "cpp",
         "cinttypes": "cpp"
-    }
+    },
+    "cmake.configureOnOpen": false
 }
