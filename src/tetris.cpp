@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
+#include <iso646.h>
 
 #include <raylib.h>
 
@@ -209,7 +210,7 @@ void GameState::nextLineClearStep() {
     // update a bunch of state after the line clear is finished
     if (this->lineClearStep == GRID_WIDTH / 2) {
         // update level if enough lines have been cleared
-        if (this->linesCleared + this->linesToClear.size() >= this->level * LINE_CLEARS_PER_LEVEL) {
+        if (this->linesCleared + int(this->linesToClear.size()) >= this->level * LINE_CLEARS_PER_LEVEL) {
             this->level++;
         }
 
@@ -246,8 +247,8 @@ Texture2D Sprites::generateSprite(int pixelLayoutIndex, Color color) {
         .data = imageData.data(),
         .width = sprite_width,
         .height = sprite_height,
+        .mipmaps = 1,
         .format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8,
-        .mipmaps = 1
     };
     sprite = LoadTextureFromImage(image);
     return sprite;
@@ -258,7 +259,8 @@ Texture2D Sprites::getSprite(SpriteType spriteType, int level) {
 }
 
 FrameDrawer::FrameDrawer() {
-    this->font = LoadFontEx("assets/CommitMonoNerdFont-Regular.otf", 24, NULL, 0);
+    this->font = LoadFontEx("resources/CommitMonoNerdFont-Regular.otf", 16, NULL, 0);
+    SetTextureFilter(this->font.texture, TEXTURE_FILTER_BILINEAR);
 }
 
 int FrameDrawer::getHorizontalOffset(Tetronimo tetronimo) {
@@ -322,23 +324,23 @@ void FrameDrawer::drawSideBar(GameState& state) {
     DrawLine(GRID_FRAME_WIDTH, 0, GRID_FRAME_WIDTH, GRID_FRAME_HEIGHT, WHITE);
 
     // draw level in side bar
-    DrawTextEx(this->font, "Level:", {GRID_FRAME_WIDTH + 10, yStart}, 12, 0, WHITE);
+    DrawTextEx(this->font, "Level:", {GRID_FRAME_WIDTH + 10, yStart}, 16, 0, WHITE);
     std::stringstream ss1;
     ss1 << std::setfill('0') << std::setw(4) << state.level;
-    DrawTextEx(this->font, ss1.str().c_str(), {GRID_FRAME_WIDTH + 10, yStart + 12} , 12, 0, WHITE);
+    DrawTextEx(this->font, ss1.str().c_str(), {GRID_FRAME_WIDTH + 10, yStart + 16} , 16, 0, WHITE);
 
     yStart += 44;
 
     // draw number of line clears in side bar
-    DrawTextEx(this->font, "Lines:", {GRID_FRAME_WIDTH + 10, yStart}, 12, 0, WHITE);
+    DrawTextEx(this->font, "Lines:", {GRID_FRAME_WIDTH + 10, yStart}, 16, 0, WHITE);
     std::stringstream ss2;
     ss2 << std::setfill('0') << std::setw(4) << state.linesCleared;
-    DrawTextEx(this->font, ss2.str().c_str(), {GRID_FRAME_WIDTH + 10, yStart + 12} , 12, 0, WHITE);
+    DrawTextEx(this->font, ss2.str().c_str(), {GRID_FRAME_WIDTH + 10, yStart + 16} , 16, 0, WHITE);
 
     yStart += 44;
 
     // draw next tetronimo in side bar
-    DrawTextEx(this->font, "Next:", {GRID_FRAME_WIDTH + 10, yStart}, 12, 0, WHITE);
+    DrawTextEx(this->font, "Next:", {GRID_FRAME_WIDTH + 10, yStart}, 16, 0, WHITE);
     Tetronimo tetronimo = state.getNextTetronimo();
     SpriteType spriteType = spriteTypeMap.at(tetronimo.shape);
     Texture2D sprite = this->sprites.getSprite(spriteType, state.level);
@@ -346,7 +348,7 @@ void FrameDrawer::drawSideBar(GameState& state) {
     int xAdjust = this->getHorizontalOffset(tetronimo);
     for (auto pos : positions) {
         float x = GRID_FRAME_WIDTH + 10 + ((pos.x + xAdjust) * BLOCK_SIZE) + ((pos.x + xAdjust) * GAP_SIZE);
-        float y = yStart + 18 + (BLOCK_SIZE * pos.y) + (pos.y * GAP_SIZE);
+        float y = yStart + 20 + (BLOCK_SIZE * pos.y) + (pos.y * GAP_SIZE);
         DrawTexturePro(
             sprite,
             { 0.0f, 0.0f, (float)sprite.width, (float)sprite.height },
