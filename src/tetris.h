@@ -16,7 +16,7 @@ enum Rotation { clockwise, counterClockwise };
 enum Direction { down, right, left };
 
 /// used as a key to map a tetromino shape to data that relates to it
-enum TetriminoShape { l, J, L, O, S, T, Z };
+enum TetriminoShape { I, J, L, O, S, T, Z };
 const int numTetriminoShapes = 6;
 
 /// There are three sprite variants for each level
@@ -37,7 +37,7 @@ const std::map<TetriminoShape,SpriteType> spriteTypeMap = {
     {O, first}, 
     {S, second}, 
     {L, third}, 
-    {l, first}
+    {I, first}
 }; 
 
 /// The first item of each rotation list is the initial orientation for a newly spawned tetrimino of
@@ -59,7 +59,7 @@ const std::map<TetriminoShape, std::vector<std::vector<Position>>> rotationListM
         {{0,-1}, {-1,0}, {0,0}, {1,0}},
         {{0,-1}, {0,0}, {1,0}, {0,1}}
     }},
-    { l, {
+    { I, {
         {{-2,0}, {-1,0}, {0,0}, {1,0}},
         {{0,-2}, {0,-1}, {0,0}, {0,1}}
     }},
