@@ -27,19 +27,19 @@ int main(void) {
         frameCounter.nextFrame();
 
         if (IsKeyPressed(KEY_RIGHT)) {
-            state.moveTetronimo(right);
+            state.moveTetrimino(right);
         }
         if (IsKeyPressed(KEY_LEFT)) {
-            state.moveTetronimo(left);
+            state.moveTetrimino(left);
         }
         if (IsKeyPressed(KEY_Z)) {
-            state.rotateTetronimo(counterClockwise);
+            state.rotateTetrimino(counterClockwise);
         } 
         if (IsKeyPressed(KEY_X)) {
-            state.rotateTetronimo(clockwise);
+            state.rotateTetrimino(clockwise);
         }
         if (IsKeyDown(KEY_DOWN) and frameCounter.framesPerSoftDropCounter >= FRAMES_PER_SOFT_DROP and not disableKeyDown) {
-            state.moveTetronimo(down);
+            state.moveTetrimino(down);
             frameCounter.resetCounters();
         }
         if (IsKeyDown(KEY_DOWN) and state.isCurrentTetrominoPlaced()) {
@@ -51,7 +51,7 @@ int main(void) {
 
         if (frameCounter.framesPerGridCellCounter >= FRAMES_PER_GRID_CELL) {
             if (not state.isCurrentTetrominoPlaced()) {
-                state.moveTetronimo(down);
+                state.moveTetrimino(down);
                 frameCounter.resetCounters();
             }
         }
@@ -66,8 +66,8 @@ int main(void) {
             }
         }
 
-        if (state.isCurrentTetrominoPlaced() and frameCounter.framesPerTetronimoResetCounter >= FRAMES_PER_TETRONIMO_RESET) {
-            state.initNewTetronimo();
+        if (state.isCurrentTetrominoPlaced() and frameCounter.framesPerTetriminoResetCounter >= FRAMES_PER_TETRONIMO_RESET) {
+            state.initNewTetrimino();
             frameCounter.resetCounters();
         }
 

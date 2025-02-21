@@ -16,8 +16,8 @@ enum Rotation { clockwise, counterClockwise };
 enum Direction { down, right, left };
 
 /// used as a key to map a tetromino shape to data that relates to it
-enum TetronimoShape { l, J, L, O, S, T, Z };
-const int numTetronimoShapes = 6;
+enum TetriminoShape { l, J, L, O, S, T, Z };
+const int numTetriminoShapes = 6;
 
 /// There are three sprite variants for each level
 /// A GridCell instance stores a spriteType instead of the sprite itself.
@@ -28,9 +28,9 @@ const int numTetronimoShapes = 6;
 /// Sprites class for retrieving a sprite.
 enum SpriteType { first = 0, second = 1, third = 2, none = 4 };
 
-/// Each tetronimo shape is associated with a SpriteType
+/// Each tetrimino shape is associated with a SpriteType
 /// the Tetromino class uses this when its getSpriteType() is called
-const std::map<TetronimoShape,SpriteType> spriteTypeMap = { 
+const std::map<TetriminoShape,SpriteType> spriteTypeMap = { 
     {T, first}, 
     {J, second}, 
     {Z, third}, 
@@ -40,19 +40,19 @@ const std::map<TetronimoShape,SpriteType> spriteTypeMap = {
     {l, first}
 }; 
 
-/// The first item of each rotation list is the initial orientation for a newly spawned tetronimo of
-/// that shape. The next list of positions for a shape are the positions of the tetronimo if it were
+/// The first item of each rotation list is the initial orientation for a newly spawned tetrimino of
+/// that shape. The next list of positions for a shape are the positions of the tetrimino if it were
 /// rotated clockwise.
 ///
 /// For example:
-/// The first item in the rotation list for tetronimo shape T looks like
+/// The first item in the rotation list for tetrimino shape T looks like
 ///  000
 ///   0
 /// The second item in the rotation list is the previous representation rotated 90 degrees clockwise
 ///   0
 ///  00
 ///   0
-const std::map<TetronimoShape, std::vector<std::vector<Position>>> rotationListMap = {
+const std::map<TetriminoShape, std::vector<std::vector<Position>>> rotationListMap = {
     { T, { 
         {{-1,0}, {0,0}, {1,0}, {0,1}},
         {{0,-1}, {-1,0}, {0,0}, {0,1}},
@@ -134,23 +134,23 @@ class GridCell {
 };
 
 /// A collection of Positions that can be translated or rotated.
-/// When a Tetronimo is moved or rotated a new Tetronimo object is created
+/// When a Tetrimino is moved or rotated a new Tetrimino object is created
 /// instead of mutating the original. This makes it easier to test a change 
 /// for a collision before commiting to it
-class Tetronimo {
+class Tetrimino {
     public:
     std::vector<std::vector<Position>> rotationList;
     int xDelta;
     int yDelta;
     int rotationStep;
-    TetronimoShape shape;
+    TetriminoShape shape;
 
     public:
-    Tetronimo(TetronimoShape shape);
-    Tetronimo(TetronimoShape shape, int xDelta, int yDelta, int rotationStep);
+    Tetrimino(TetriminoShape shape);
+    Tetrimino(TetriminoShape shape, int xDelta, int yDelta, int rotationStep);
     std::vector<Position> getPositions();
-    Tetronimo move(Direction direction);
-    Tetronimo rotate(Rotation rotation);
+    Tetrimino move(Direction direction);
+    Tetrimino rotate(Rotation rotation);
     SpriteType getSpriteType();
 };
 
@@ -173,18 +173,18 @@ class GameState {
     /*
     * - grid: keeps track of the fallen tetrominos that can no longer be moved. This usually does not 
     * include the current tetromino.
-    * - currentTetronimo: the falling tetronimo being controlled by the player
-    * - isCurrentTetronimoPlaced: Flag keeps track of if the current tetromino has been placed in the grid. 
-    * The flag is set by moveTetronimo member function when the current tetronimo can no longer move
-    * down and is placed in the grid.the flag is unset when initNewTetronimo is called.
+    * - currentTetrimino: the falling tetrimino being controlled by the player
+    * - isCurrentTetriminoPlaced: Flag keeps track of if the current tetromino has been placed in the grid. 
+    * The flag is set by moveTetrimino member function when the current tetrimino can no longer move
+    * down and is placed in the grid.the flag is unset when initNewTetrimino is called.
     * - linesToClear: used for animating line clears. Grid indices of rows being cleared
     * - lineClearStep: current step in the row clear animation
     */
     private:
     GameGrid grid;
-    Tetronimo currentTetronimo = Tetronimo(T); // replaced with random tetronimo in constructor
-    Tetronimo nextTetronimo = Tetronimo(T); // replacedw tih random tetronimo in constructor
-    bool isCurrentTetronimoPlaced = false;
+    Tetrimino currentTetrimino = Tetrimino(T); // replaced with random tetrimino in constructor
+    Tetrimino nextTetrimino = Tetrimino(T); // replacedw tih random tetrimino in constructor
+    bool isCurrentTetriminoPlaced = false;
     std::vector<int> linesToClear;
     int lineClearStep = 0; 
 
@@ -196,10 +196,10 @@ class GameState {
     public:
     GameState();
     GameGrid getGrid();
-    Tetronimo getCurrentTetronimo();
-    Tetronimo getNextTetronimo();
+    Tetrimino getCurrentTetrimino();
+    Tetrimino getNextTetrimino();
     bool isCurrentTetrominoPlaced();
-    void initNewTetronimo();
+    void initNewTetrimino();
 
     /* 
     * Moves the current tetromino one cell in the given direction so long as it does not cause a 
@@ -208,13 +208,13 @@ class GameState {
     * A down movement that results in a collision causes the current tetromino to be placed where it 
     * is in the grid and a new tetromino to be initialized
     */
-    void moveTetronimo(Direction direction);
+    void moveTetrimino(Direction direction);
 
     /*
-    * Rotates the current tetronimo as long as it doesn't result in a collision. Rotations
+    * Rotates the current tetrimino as long as it doesn't result in a collision. Rotations
     * that would cause a collision are ignored
     */
-    void rotateTetronimo(Rotation rotation);
+    void rotateTetrimino(Rotation rotation);
 
     /* 
     * returns true if a row clear animation is in progress. This means that rowsToClear and 
@@ -247,8 +247,8 @@ class FrameDrawer {
     int gameOverStep = 0;
 
     private:
-    int getHorizontalOffset(Tetronimo tetronimo);
-    void drawCurrentTetronimo(GameState& state);
+    int getHorizontalOffset(Tetrimino tetrimino);
+    void drawCurrentTetrimino(GameState& state);
     void drawGridCells(GameState& state);
     void drawSideBar(GameState& state);
     void drawGameOver(int level);
@@ -263,7 +263,7 @@ class FrameCounter {
     public:
     int framesPerGridCellCounter = 0;
     int framesPerSoftDropCounter = 0;
-    int framesPerTetronimoResetCounter = 0;
+    int framesPerTetriminoResetCounter = 0;
     int framesPerLineClearCounter = 0;
     int framesPerGameOverStepCounter = 0;
 

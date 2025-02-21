@@ -1,7 +1,7 @@
 #include <vector>
 #include "tetris.h"
 
-// struct TetronimoState {
+// struct TetriminoState {
 //     int x;
 //     int y;
 //     int rotation;
@@ -18,7 +18,7 @@
 
 // struct SearchResult {
 //     GameGrid grid;
-//     std::vector<TetronimoState> StateSequence;
+//     std::vector<TetriminoState> StateSequence;
 
 // };
 

@@ -10,10 +10,10 @@
 #include "constants.h"
 
 /***********
- * Tetronimo
+ * Tetrimino
  ***********/
 
-Tetronimo::Tetronimo(TetronimoShape shape) {
+Tetrimino::Tetrimino(TetriminoShape shape) {
     this->shape = shape;
     this->rotationList = rotationListMap.at(shape);
     this->xDelta = 0;
@@ -21,7 +21,7 @@ Tetronimo::Tetronimo(TetronimoShape shape) {
     this->rotationStep = 0;
 }
 
-Tetronimo::Tetronimo(TetronimoShape shape, int xDelta, int yDelta, int rotationStep) {
+Tetrimino::Tetrimino(TetriminoShape shape, int xDelta, int yDelta, int rotationStep) {
     this->shape = shape;
     this->rotationList = rotationListMap.at(shape);
     this->xDelta = xDelta;
@@ -29,7 +29,7 @@ Tetronimo::Tetronimo(TetronimoShape shape, int xDelta, int yDelta, int rotationS
     this->rotationStep = rotationStep % this->rotationList.size();
 }
 
-std::vector<Position> Tetronimo::getPositions() {
+std::vector<Position> Tetrimino::getPositions() {
     std::vector<Position> positions;
     for (Position p : this->rotationList[this->rotationStep]) {
         positions.push_back({p.x + this->xDelta, p.y + this->yDelta});
@@ -37,19 +37,19 @@ std::vector<Position> Tetronimo::getPositions() {
     return positions;
 }
 
-Tetronimo Tetronimo::move(Direction direction) {
+Tetrimino Tetrimino::move(Direction direction) {
     if (direction == down) {
-        return Tetronimo(this->shape, this->xDelta, this->yDelta + 1, this->rotationStep);
+        return Tetrimino(this->shape, this->xDelta, this->yDelta + 1, this->rotationStep);
     }
     else if (direction == right) {
-        return Tetronimo(this->shape, this->xDelta + 1, this->yDelta, this->rotationStep);
+        return Tetrimino(this->shape, this->xDelta + 1, this->yDelta, this->rotationStep);
     }
     else { // direction == left
-        return Tetronimo(this->shape, this->xDelta - 1, this->yDelta, this->rotationStep);
+        return Tetrimino(this->shape, this->xDelta - 1, this->yDelta, this->rotationStep);
     }
 }
 
-Tetronimo Tetronimo::rotate(Rotation rotation) {
+Tetrimino Tetrimino::rotate(Rotation rotation) {
     int rotationStep;
     if (rotation == clockwise) {
         rotationStep = (this->rotationStep + 1) % this->rotationList.size();
@@ -57,10 +57,10 @@ Tetronimo Tetronimo::rotate(Rotation rotation) {
     else { // rotation == counterClockwise
         rotationStep = (this->rotationStep - 1) % this->rotationList.size();
     }
-    return Tetronimo(this->shape, this->xDelta, this->yDelta, rotationStep);
+    return Tetrimino(this->shape, this->xDelta, this->yDelta, rotationStep);
 }
 
-SpriteType Tetronimo::getSpriteType() {
+SpriteType Tetrimino::getSpriteType() {
     return spriteTypeMap.at(this->shape);
 }
 
@@ -137,62 +137,62 @@ void GameGrid::clearRows(std::vector<int> row_indices) {
  ***********/
 
 GameState::GameState() {
-    this->currentTetronimo = Tetronimo(static_cast<TetronimoShape>(rand() % numTetronimoShapes)); 
-    this->currentTetronimo.xDelta = SPAWN_X_DELTA;
+    this->currentTetrimino = Tetrimino(static_cast<TetriminoShape>(rand() % numTetriminoShapes)); 
+    this->currentTetrimino.xDelta = SPAWN_X_DELTA;
 
-    this->nextTetronimo = Tetronimo(static_cast<TetronimoShape>(rand() % numTetronimoShapes));
+    this->nextTetrimino = Tetrimino(static_cast<TetriminoShape>(rand() % numTetriminoShapes));
 }
 
 GameGrid GameState::getGrid() { return this->grid; }
-Tetronimo GameState::getCurrentTetronimo() { return this->currentTetronimo; }
-Tetronimo GameState::getNextTetronimo() { return this->nextTetronimo; }
-bool GameState::isCurrentTetrominoPlaced() { return this->isCurrentTetronimoPlaced; }
+Tetrimino GameState::getCurrentTetrimino() { return this->currentTetrimino; }
+Tetrimino GameState::getNextTetrimino() { return this->nextTetrimino; }
+bool GameState::isCurrentTetrominoPlaced() { return this->isCurrentTetriminoPlaced; }
 
-void GameState::initNewTetronimo() { 
-    this->currentTetronimo = this->nextTetronimo;
-    this->currentTetronimo.xDelta = SPAWN_X_DELTA;
+void GameState::initNewTetrimino() { 
+    this->currentTetrimino = this->nextTetrimino;
+    this->currentTetrimino.xDelta = SPAWN_X_DELTA;
 
-    this->nextTetronimo = Tetronimo(static_cast<TetronimoShape>(rand() % numTetronimoShapes)); 
-    this->isCurrentTetronimoPlaced = false;
+    this->nextTetrimino = Tetrimino(static_cast<TetriminoShape>(rand() % numTetriminoShapes)); 
+    this->isCurrentTetriminoPlaced = false;
 
-    if (this->grid.checkCollision(this->currentTetronimo.getPositions())) {
+    if (this->grid.checkCollision(this->currentTetrimino.getPositions())) {
         this->gameOver = true;
     }
 }
 
-void GameState::moveTetronimo(Direction direction) {
+void GameState::moveTetrimino(Direction direction) {
     // tetromino can no longer be moved so command is ignored
-    if (this->isCurrentTetronimoPlaced) {
+    if (this->isCurrentTetriminoPlaced) {
         return;
     }
 
     if (direction == down) {
-        Tetronimo tmpTetronimo = this->currentTetronimo.move(down);
-        if (this->grid.checkCollision(tmpTetronimo.getPositions())) {
-            for (auto p : this->currentTetronimo.getPositions()) {
+        Tetrimino tmpTetrimino = this->currentTetrimino.move(down);
+        if (this->grid.checkCollision(tmpTetrimino.getPositions())) {
+            for (auto p : this->currentTetrimino.getPositions()) {
                 this->grid.setCell(
                     p, 
-                    this->currentTetronimo.getSpriteType());
+                    this->currentTetrimino.getSpriteType());
             }
-            this->isCurrentTetronimoPlaced = true;
+            this->isCurrentTetriminoPlaced = true;
             this->linesToClear = this->grid.getFullRows();
         }
         else {
-            this->currentTetronimo = tmpTetronimo;
+            this->currentTetrimino = tmpTetrimino;
         }
     }
     else { // direction is left or right
-        Tetronimo tmpTetronimo = this->currentTetronimo.move(direction);
-        if (not this->grid.checkCollision(tmpTetronimo.getPositions())) {
-            this->currentTetronimo = tmpTetronimo;
+        Tetrimino tmpTetrimino = this->currentTetrimino.move(direction);
+        if (not this->grid.checkCollision(tmpTetrimino.getPositions())) {
+            this->currentTetrimino = tmpTetrimino;
         }
     }
 }
 
-void GameState::rotateTetronimo(Rotation rotation) {
-    Tetronimo tmpTetronimo = this->currentTetronimo.rotate(rotation);
-    if (not this->grid.checkCollision(tmpTetronimo.getPositions())) {
-        this->currentTetronimo = tmpTetronimo;
+void GameState::rotateTetrimino(Rotation rotation) {
+    Tetrimino tmpTetrimino = this->currentTetrimino.rotate(rotation);
+    if (not this->grid.checkCollision(tmpTetrimino.getPositions())) {
+        this->currentTetrimino = tmpTetrimino;
     }
 }
 
@@ -263,9 +263,9 @@ FrameDrawer::FrameDrawer() {
     SetTextureFilter(this->font.texture, TEXTURE_FILTER_BILINEAR);
 }
 
-int FrameDrawer::getHorizontalOffset(Tetronimo tetronimo) {
+int FrameDrawer::getHorizontalOffset(Tetrimino tetrimino) {
     int ret = 10; // arbitrary large number
-    for (auto pos : tetronimo.getPositions()) {
+    for (auto pos : tetrimino.getPositions()) {
         if (pos.x < ret) {
             ret = pos.x;
         }
@@ -273,12 +273,12 @@ int FrameDrawer::getHorizontalOffset(Tetronimo tetronimo) {
     return -ret;
 }
 
-void FrameDrawer::drawCurrentTetronimo(GameState& state) {
+void FrameDrawer::drawCurrentTetrimino(GameState& state) {
     if (not state.isCurrentTetrominoPlaced()) {
-        Tetronimo tetronimo = state.getCurrentTetronimo();
-        SpriteType spriteType = tetronimo.getSpriteType();
+        Tetrimino tetrimino = state.getCurrentTetrimino();
+        SpriteType spriteType = tetrimino.getSpriteType();
         Texture2D sprite = this->sprites.getSprite(spriteType, state.level);
-        for (auto gridPos : tetronimo.getPositions()) {
+        for (auto gridPos : tetrimino.getPositions()) {
             float x = (gridPos.x * BLOCK_SIZE) + (gridPos.x * GAP_SIZE) + GAP_SIZE;
             float y = (BLOCK_SIZE * gridPos.y) + (gridPos.y * GAP_SIZE) + GAP_SIZE;
             DrawTexturePro(
@@ -339,13 +339,13 @@ void FrameDrawer::drawSideBar(GameState& state) {
 
     yStart += 44;
 
-    // draw next tetronimo in side bar
+    // draw next tetrimino in side bar
     DrawTextEx(this->font, "Next:", {GRID_FRAME_WIDTH + 10, yStart}, 16, 0, WHITE);
-    Tetronimo tetronimo = state.getNextTetronimo();
-    SpriteType spriteType = spriteTypeMap.at(tetronimo.shape);
+    Tetrimino tetrimino = state.getNextTetrimino();
+    SpriteType spriteType = spriteTypeMap.at(tetrimino.shape);
     Texture2D sprite = this->sprites.getSprite(spriteType, state.level);
-    auto positions = rotationListMap.at(tetronimo.shape)[0];
-    int xAdjust = this->getHorizontalOffset(tetronimo);
+    auto positions = rotationListMap.at(tetrimino.shape)[0];
+    int xAdjust = this->getHorizontalOffset(tetrimino);
     for (auto pos : positions) {
         float x = GRID_FRAME_WIDTH + 10 + ((pos.x + xAdjust) * BLOCK_SIZE) + ((pos.x + xAdjust) * GAP_SIZE);
         float y = yStart + 20 + (BLOCK_SIZE * pos.y) + (pos.y * GAP_SIZE);
@@ -380,7 +380,7 @@ void FrameDrawer::drawGameOver(int level) {
 void FrameDrawer::drawFrame(GameState& state) {
     BeginDrawing();
         ClearBackground(BLACK);
-        this->drawCurrentTetronimo(state);
+        this->drawCurrentTetrimino(state);
         this->drawGridCells(state);
         this->drawSideBar(state);
 
@@ -399,7 +399,7 @@ void FrameDrawer::nextGameOverStep() {
 void FrameCounter::nextFrame() {
     this->framesPerGridCellCounter++;
     this->framesPerSoftDropCounter++;
-    this->framesPerTetronimoResetCounter++;
+    this->framesPerTetriminoResetCounter++;
     this->framesPerLineClearCounter++;
     this->framesPerGameOverStepCounter++;
 }
@@ -407,7 +407,7 @@ void FrameCounter::nextFrame() {
 void FrameCounter::resetCounters() {
     this->framesPerGridCellCounter = 0;
     this->framesPerSoftDropCounter = 0;
-    this->framesPerTetronimoResetCounter = 0;
+    this->framesPerTetriminoResetCounter = 0;
     this->framesPerLineClearCounter = 0;
     this->framesPerGameOverStepCounter = 0;
 }

@@ -10,7 +10,7 @@ const int GAP_SIZE = 2;
 const int GRID_FRAME_WIDTH = GRID_WIDTH * (BLOCK_SIZE + GAP_SIZE) + GAP_SIZE; // width in pixels
 const int GRID_FRAME_HEIGHT = GRID_HEIGHT * (BLOCK_SIZE + GAP_SIZE) + GAP_SIZE;
 
-// x delta to apply to a newly spawned tetronimo
+// x delta to apply to a newly spawned tetrimino
 const int SPAWN_X_DELTA = 5;
 
 // For animating line clears.
@@ -21,9 +21,9 @@ const int LEFT_MIDDLE_INDEX = (GRID_WIDTH / 2) - 1;
 const int RIGHT_MIDDLE_INDEX = GRID_WIDTH / 2;
 
 // frame counters for controlling the speed of animations
-const int FRAMES_PER_GRID_CELL = 5; // speed at which the tetronimo falls
+const int FRAMES_PER_GRID_CELL = 5; // speed at which the tetrimino falls
 const int FRAMES_PER_SOFT_DROP = 1; // falling speed down down arrow key is pressed
-const int FRAMES_PER_TETRONIMO_RESET = 5; // frames between tetronimo being placed and a new one initializing
+const int FRAMES_PER_TETRONIMO_RESET = 5; // frames between tetrimino being placed and a new one initializing
 const int FRAMES_PER_LINE_CLEAR = 2; // speed of the line clearing animation
 const int FRAMES_PER_GAME_OVER_STEP = 3;
 
