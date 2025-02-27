@@ -162,11 +162,12 @@ class GameGrid {
     GameGrid();
     bool isEmpty(Position p);
     SpriteType getSpriteType(Position p); 
-    void setCell(Position p, SpriteType spriteType);
+    void setCells(Tetrimino tetrimino);
     void clearCell(Position p);
     bool checkCollision(std::vector<Position> positions);
     std::vector<int> getFullRows();
     void clearRows(std::vector<int> row_indexes);
+    void print();
 };
 
 class GameState {

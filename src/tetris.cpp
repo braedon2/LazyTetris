@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iomanip>
 #include <iso646.h>
+#include <iostream>
 
 #include <raylib.h>
 
@@ -82,8 +83,10 @@ SpriteType GameGrid::getSpriteType(Position p) {
     return this->grid[p.y][p.x].spriteType;
 }
 
-void GameGrid::setCell(Position p, SpriteType spriteType) {
-    this->grid[p.y][p.x] = GridCell(spriteType, false);
+void GameGrid::setCells(Tetrimino tetrimino) {
+    for (Position p : tetrimino.getPositions()) {
+        this->grid[p.y][p.x] = GridCell(tetrimino.getSpriteType(), false);
+    }
 }
 
 void GameGrid::clearCell(Position p) {
@@ -132,6 +135,22 @@ void GameGrid::clearRows(std::vector<int> row_indices) {
     }
 }
 
+void GameGrid::print() {
+    for (const auto& row : this->grid) {
+        std::cout << "|";
+        for (const auto& cell : row) {
+            if (cell.isEmpty) {
+                std::cout << " ";
+            } 
+            else {
+                std::cout << "*";
+            }
+        }
+        std::cout << "|" << std::endl;
+    }
+    std::cout << "------------" << std::endl;
+}
+
 /***********
  * GameState
  ***********/
@@ -170,9 +189,7 @@ void GameState::moveTetrimino(Direction direction) {
         Tetrimino tmpTetrimino = this->currentTetrimino.move(down);
         if (this->grid.checkCollision(tmpTetrimino.getPositions())) {
             for (auto p : this->currentTetrimino.getPositions()) {
-                this->grid.setCell(
-                    p, 
-                    this->currentTetrimino.getSpriteType());
+                this->grid.setCells(this->currentTetrimino);
             }
             this->isCurrentTetriminoPlaced = true;
             this->linesToClear = this->grid.getFullRows();

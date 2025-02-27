@@ -34,6 +34,7 @@ endif()
 FetchContent_Declare(
   googletest
   URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+  DOWNLOAD_EXTRACT_TIMESTAMP True #This option is not required but suppresses a warning
 )
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
@@ -63,13 +64,16 @@ endif ()
 enable_testing()
 
 add_executable(
-  hello_test
-  test/hello_test.cpp
+  solver_test
+  src/tetris.cpp 
+  src/solver.cpp
+  test/solver_test.cpp
 )
 target_link_libraries(
-  hello_test
+  solver_test
   GTest::gtest_main
+  raylib
 )
 
 include(GoogleTest)
-gtest_discover_tests(hello_test)
+gtest_discover_tests(solver_test)
