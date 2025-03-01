@@ -1,8 +1,6 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#include <map>
-
 const int GRID_WIDTH = 10; // width in blocks
 const int GRID_HEIGHT = 20;
 const int BLOCK_SIZE = 12;

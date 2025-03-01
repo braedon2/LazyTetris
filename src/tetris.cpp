@@ -85,8 +85,12 @@ SpriteType GameGrid::getSpriteType(Position p) {
 
 void GameGrid::setCells(Tetrimino tetrimino) {
     for (Position p : tetrimino.getPositions()) {
-        this->grid[p.y][p.x] = GridCell(tetrimino.getSpriteType(), false);
+        this->grid.at(p.y).at(p.x) = GridCell(tetrimino.getSpriteType(), false);
     }
+}
+
+void GameGrid::setCell(Position position, SpriteType spriteType) {
+    this->grid.at(position.y).at(position.x) = GridCell(spriteType, false);
 }
 
 void GameGrid::clearCell(Position p) {

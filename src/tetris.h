@@ -1,6 +1,7 @@
 #ifndef TETRIS_H
 #define TETRIS_H
 
+#include <map>
 #include <vector>
 #include "raylib.h"
 #include "constants.h"
@@ -163,6 +164,7 @@ class GameGrid {
     bool isEmpty(Position p);
     SpriteType getSpriteType(Position p); 
     void setCells(Tetrimino tetrimino);
+    void setCell(Position position, SpriteType spriteType);
     void clearCell(Position p);
     bool checkCollision(std::vector<Position> positions);
     std::vector<int> getFullRows();
