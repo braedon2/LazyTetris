@@ -16,6 +16,7 @@ void setNodeNeighbours(GraphNode& node, Graph& graph, GameGrid& grid) {
     }
 }
 
+
 Graph makeGraph(int width, int height, Tetrimino& tetrimino, GameGrid& grid) {
     Graph graph;
     for (int i = 0; i < height; i++) {
@@ -38,6 +39,7 @@ Graph makeGraph(int width, int height, Tetrimino& tetrimino, GameGrid& grid) {
     }
     return graph;
 }
+
 
 std::vector<GraphNode*> search(Graph& graph, Tetrimino& tetrimino, GameGrid& grid) {
     std::queue<GraphNode*> queue;
@@ -65,4 +67,38 @@ std::vector<GraphNode*> search(Graph& graph, Tetrimino& tetrimino, GameGrid& gri
         }
     }
     return results;
+}
+
+
+EvaluationFactors computeEvaluationFactors(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) {
+    EvaluationFactors factors;
+    grid.setCells(firstTetrimino);
+    grid.setCells(secondTetrimino);
+
+    factors.totalLinesCleared = grid.getFullRows().size();
+    factors.totalLockHeight = firstTetrimino.getHeight() + secondTetrimino.getHeight();
+
+    for (int col = 0; col < GRID_WIDTH; col++) {
+        for (int row = 1; row < GRID_HEIGHT; row++) {
+            if (not grid.isEmpty(col, row)) {
+                break;
+            }
+
+            if (col == 0) {
+                if (not grid.isEmpty(col+1, row)) {
+                    factors.totalWellCells++;
+                }
+            } else if (col == GRID_WIDTH-1) {
+                if (not grid.isEmpty(col-1, row)) {
+                    factors.totalWellCells++;
+                }
+            } else if (not grid.isEmpty(col-1, row) and not grid.isEmpty(col+1, row)) {
+                factors.totalWellCells++;
+            }
+        }
+    }
+
+    // calculate column holes
+
+    return factors;
 }

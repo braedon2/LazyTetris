@@ -14,7 +14,7 @@ file(CREATE_LINK "${CMAKE_CURRENT_SOURCE_DIR}/resources"
     "${CMAKE_BINARY_DIR}/resources" SYMBOLIC)
 
 # Set the project name. This is not the executable program's name!
-project(graphical_template)
+project(lazy_tetris)
 
 # Try to find a locally installed raylib, but don't quit on fail
 find_package(raylib 5.5 QUIET)

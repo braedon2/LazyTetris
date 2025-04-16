@@ -11,7 +11,7 @@
                 "request": "launch",
                 "program": "${cmake.testProgram}",
                 "args": [ "${cmake.testArgs}" ],
-                // other options...
+                "miDebuggerPath": "C:/Program Files/LLVM/bin/lldb.exe"
             }
         ]
 }

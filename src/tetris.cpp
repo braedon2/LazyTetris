@@ -32,7 +32,7 @@ Tetrimino::Tetrimino(TetriminoShape shape, int xDelta, int yDelta, int rotationS
 
 std::vector<Position> Tetrimino::getPositions() {
     std::vector<Position> positions;
-    for (Position p : this->rotationList[this->rotationStep]) {
+    for (Position p : this->rotationList.at(this->rotationStep)) {
         positions.push_back({p.x + this->xDelta, p.y + this->yDelta});
     }
     return positions;
@@ -65,6 +65,17 @@ SpriteType Tetrimino::getSpriteType() {
     return spriteTypeMap.at(this->shape);
 }
 
+int Tetrimino::getHeight() {
+    int height = 100; // arbitrary big number
+    for (Position p : this->rotationList.at(this->rotationStep)) {
+        // coordinates start in top left but height is considered from the bottom so we subtract
+        if (GRID_HEIGHT - 1 - (p.y + this->yDelta) < height) {
+            height = GRID_HEIGHT - 1 - (p.y + this->yDelta);
+        }
+    }
+    return height;
+}
+
 /**********
  * GameGrid
  **********/
@@ -76,7 +87,11 @@ GameGrid::GameGrid() {
 }
 
 bool GameGrid::isEmpty(Position p) {
-    return this->grid[p.y][p.x].isEmpty;
+    return this->grid.at(p.y).at(p.x).isEmpty;
+}
+
+bool GameGrid::isEmpty(int x, int y) {
+    return this->grid.at(y).at(x).isEmpty;
 }
 
 SpriteType GameGrid::getSpriteType(Position p) {

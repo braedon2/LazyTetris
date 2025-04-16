@@ -64,3 +64,45 @@ TEST(SearchTest, NonEmptyGridSlideIntoPlace) {
 
     EXPECT_EQ(found, true);
 }
+
+TEST(EvaluationTest, AllFactors) {
+    GameGrid grid;
+    Tetrimino firstTetrimino = Tetrimino(I, 1, 17, 1);
+    Tetrimino secondTetrimino = Tetrimino(S, 4, 15, 0);
+    std::vector<std::vector<int>> gridFillData = {
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // starting at row 15 (0 indexed)
+        { 0, 0, 0, 0, 0, 0, 1, 0, 1, 0},
+        { 1, 0, 1, 1, 1, 1, 1, 1, 1, 1},
+        { 1, 0, 1, 1, 1, 1, 1, 1, 1, 1},
+        { 0, 1, 0, 1, 1, 0, 1, 0, 1, 0}
+    };
+    for (int i = 0; i < gridFillData.size(); i++) {
+        for (int j = 0; j < gridFillData[0].size(); j++) {
+            if (gridFillData[i][j]) {
+                grid.setCell(Position(j, i + 15), first);
+            }
+        }
+    }
+
+    std::cout << "\ngrid without tetriminos:" << std::endl;
+    grid.print();
+    GameGrid tmpGrid = grid;
+    tmpGrid.setCells(firstTetrimino);
+    tmpGrid.setCells(secondTetrimino);
+    std::cout << "\n grid with tetriminos:" << std::endl;
+    tmpGrid.print();
+
+    EvaluationFactors factors = computeEvaluationFactors(grid, firstTetrimino, secondTetrimino);
+
+    EXPECT_EQ(factors.totalLinesCleared, 2);
+    EXPECT_EQ(factors.totalLockHeight, 4);
+    EXPECT_EQ(factors.totalWellCells, 5);
+}
+
+TEST(EvaluationTest, WellCellsInColumnWithIntermittentGapsInWellWalls) {
+    GameGrid grid;
+}
+
+TEST(EvaluationTest, EmptyColumnHasNoTransitions) {
+    GameGrid grid;
+}

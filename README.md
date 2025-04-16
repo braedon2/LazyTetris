@@ -13,3 +13,9 @@ The configure command that the extension uses is:
 ```
 "C:\Program Files\CMake\bin\cmake.EXE" -DCMAKE_BUILD_TYPE:STRING=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE "-DCMAKE_C_COMPILER:FILEPATH=C:\Program Files\LLVM\bin\clang exe" "-DCMAKE_CXX_COMPILER:FILEPATH=C:\Program Files\LLVM\bin\clang++.exe" --no-warn-unused-cli -SE:/Projects/LazyTetris -Be:/Projects/LazyTetris/build -G "Unix Makefiles"
 ```
+
+## Testing
+
+* Run `ctest` inside the build directory to run all tests 
+* Run individual test: `ctest -R ^TestSuite\.TestName$`
+* Use `--verbose` flag to see print statements

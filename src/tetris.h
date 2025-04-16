@@ -153,6 +153,7 @@ class Tetrimino {
     Tetrimino move(Direction direction);
     Tetrimino rotate(Rotation rotation);
     SpriteType getSpriteType();
+    int getHeight();
 };
 
 class GameGrid {
@@ -162,6 +163,7 @@ class GameGrid {
     public:
     GameGrid();
     bool isEmpty(Position p);
+    bool isEmpty(int x, int y);
     SpriteType getSpriteType(Position p); 
     void setCells(Tetrimino tetrimino);
     void setCell(Position position, SpriteType spriteType);
