@@ -1,12 +1,9 @@
 #ifndef SOLVER_H
 #define SOLVER_H
 
+#include <variant>
 #include <vector>
 #include "tetris.h"
-
-/***
- * Searcher definitions
- ***/
 
 struct GraphNode {
     Tetrimino tetrimino;
@@ -15,15 +12,7 @@ struct GraphNode {
     std::vector<GraphNode*> neighbours;
 };
 
-typedef std::vector<std::vector<GraphNode>> Graph; // first dimension is row second dimension is column
-
-void setNodeNeighbours(GraphNode& node, Graph& graph, GameGrid& grid);
-Graph makeGraph(int width, int height, Tetrimino& tetrimino, GameGrid& grid);
-std::vector<GraphNode*> search(Graph &graph, Tetrimino& tetrimino, GameGrid& grid);
-
-/***
- * Solver definitions
- ***/
+typedef std::vector<std::vector<std::vector<GraphNode>>> Graph; // first dimension is row second dimension is column
 
 struct EvaluationFactors {
     int totalLinesCleared = 0;
@@ -34,6 +23,14 @@ struct EvaluationFactors {
     int totalRowTransitions = 0;
 };
 
-EvaluationFactors computeEvaluationFactors(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino);
+void setNodeNeighbours(GraphNode& node, Graph& graph, GameGrid& grid);
+Graph makeGraph(Tetrimino& tetrimino, GameGrid& grid);
+std::vector<GraphNode*> search(Graph &graph, Tetrimino& tetrimino, GameGrid& grid);
+std::vector<std::variant<Direction, Rotation>> movesToReachSearchResult(GraphNode *searchResult);
+
+void computeEvaluationFactors(GameGrid grid, EvaluationFactors& factors);
+double computeFitness(EvaluationFactors factors);
+
+std::vector<std::variant<Direction, Rotation>> solve(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino);
 
 #endif
