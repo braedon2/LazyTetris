@@ -83,7 +83,8 @@ std::vector<GraphNode*> search(Graph& graph, Tetrimino& tetrimino, GameGrid& gri
     return results;
 }
 
-std::vector<std::variant<Direction, Rotation>> movesToReachSearchResult(GraphNode *searchResult) {
+
+Moves movesToReachSearchResult(GraphNode *searchResult) {
     GraphNode *node = searchResult;
     Moves moves; // iterating from locked position to spawn point means this will need to be reversed before returning
 
@@ -105,6 +106,7 @@ std::vector<std::variant<Direction, Rotation>> movesToReachSearchResult(GraphNod
     std::reverse(moves.begin(), moves.end());
     return moves;
 }
+
 
 void computeEvaluationFactors(GameGrid grid, EvaluationFactors& factors) {
     // A well cell is an empty cell located above all the solid cells within its column such that 
@@ -193,6 +195,7 @@ void computeEvaluationFactors(GameGrid grid, EvaluationFactors& factors) {
     }
 }
 
+
 double computeFitness(EvaluationFactors factors) {
     return (
         factors.totalLinesCleared * 1.0 +
@@ -203,6 +206,7 @@ double computeFitness(EvaluationFactors factors) {
         factors.totalRowTransitions + 30.185110719279040
     );
 }
+
 
 Moves solve(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) {
     GraphNode *bestResult;
