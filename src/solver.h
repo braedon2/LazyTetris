@@ -23,14 +23,17 @@ struct EvaluationFactors {
     int totalRowTransitions = 0;
 };
 
+typedef std::variant<Direction, Rotation> Move;
+typedef std::vector<Move> Moves;
+
 void setNodeNeighbours(GraphNode& node, Graph& graph, GameGrid& grid);
 Graph makeGraph(Tetrimino& tetrimino, GameGrid& grid);
 std::vector<GraphNode*> search(Graph &graph, Tetrimino& tetrimino, GameGrid& grid);
-std::vector<std::variant<Direction, Rotation>> movesToReachSearchResult(GraphNode *searchResult);
+Moves movesToReachSearchResult(GraphNode *searchResult);
 
 void computeEvaluationFactors(GameGrid grid, EvaluationFactors& factors);
 double computeFitness(EvaluationFactors factors);
 
-std::vector<std::variant<Direction, Rotation>> solve(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino);
+Moves solve(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino);
 
 #endif

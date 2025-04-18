@@ -75,6 +75,15 @@ int Tetrimino::getHeight() {
     return height;
 }
 
+bool Tetrimino::operator == (const Tetrimino& tetrimino) const {
+    return (
+        this->xDelta == tetrimino.xDelta and
+        this->yDelta == tetrimino.yDelta and 
+        this->rotationStep == tetrimino.rotationStep and
+        this->shape == tetrimino.shape
+    );
+}
+
 /**********
  * GameGrid
  **********/

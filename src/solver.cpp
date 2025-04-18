@@ -1,4 +1,6 @@
+#include <algorithm>
 #include <queue>
+#include <variant>
 #include <vector>
 #include "constants.h"
 #include "tetris.h"
@@ -81,6 +83,28 @@ std::vector<GraphNode*> search(Graph& graph, Tetrimino& tetrimino, GameGrid& gri
     return results;
 }
 
+std::vector<std::variant<Direction, Rotation>> movesToReachSearchResult(GraphNode *searchResult) {
+    GraphNode *node = searchResult;
+    Moves moves; // iterating from locked position to spawn point means this will need to be reversed before returning
+
+    while (node->prev != nullptr) {
+        Tetrimino current = node->tetrimino;
+        Tetrimino parent = node->prev->tetrimino;
+
+        if (current.xDelta != parent.xDelta) {
+            parent.xDelta < current.xDelta ? moves.push_back(right) : moves.push_back(left);
+        }
+        else if (current.rotationStep != parent.rotationStep) {
+            parent.rotationStep < current.rotationStep ? moves.push_back(clockwise) : moves.push_back(counterClockwise);
+        }
+        else {
+            moves.push_back(down);
+        }
+        node = node->prev;
+    }
+    std::reverse(moves.begin(), moves.end());
+    return moves;
+}
 
 void computeEvaluationFactors(GameGrid grid, EvaluationFactors& factors) {
     // A well cell is an empty cell located above all the solid cells within its column such that 
@@ -180,7 +204,7 @@ double computeFitness(EvaluationFactors factors) {
     );
 }
 
-std::vector<std::variant<Direction, Rotation>> solve(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) {
+Moves solve(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) {
     GraphNode *bestResult;
     double bestFitness = -1.0;
     Graph firstGraph = makeGraph(firstTetrimino, grid);

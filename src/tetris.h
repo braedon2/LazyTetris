@@ -154,6 +154,7 @@ class Tetrimino {
     Tetrimino rotate(Rotation rotation);
     SpriteType getSpriteType();
     int getHeight();
+    bool operator == (const Tetrimino& tetrimino) const;
 };
 
 class GameGrid {

@@ -98,6 +98,35 @@ TEST(SearchTest, NonEmptyGridSlideIntoPlace) {
     EXPECT_EQ(found, true);
 }
 
+TEST(SearchTest, FollowMovesOfVerticalITetrimino) {
+    GameGrid grid;
+    Tetrimino tetrimino(I);
+    tetrimino.xDelta = SPAWN_X_DELTA;
+    Graph graph = makeGraph(tetrimino, grid);
+
+    std::vector<GraphNode*> results = search(graph, tetrimino, grid);
+    EXPECT_EQ(results.at(1)->tetrimino.rotationStep, 1);
+
+    Moves moves = movesToReachSearchResult(results.at(1));
+
+    for (Move move : moves) {
+        if (std::holds_alternative<Direction>(move)) {
+            tetrimino = tetrimino.move(std::get<Direction>(move));
+        } 
+        else if (std::holds_alternative<Rotation>(move)) {
+            tetrimino = tetrimino.rotate(std::get<Rotation>(move));
+        }
+
+        GameGrid gridCopy = grid;
+        gridCopy.setCells(tetrimino);
+        gridCopy.print();
+    }
+
+    EXPECT_EQ(results.at(1)->tetrimino.xDelta, tetrimino.xDelta);
+    EXPECT_EQ(results.at(1)->tetrimino.yDelta, tetrimino.yDelta);
+    EXPECT_EQ(results.at(1)->tetrimino, tetrimino);
+}
+
 TEST(EvaluationTest, AllFactors) {
     GameGrid grid;
     std::vector<std::vector<int>> gridFillData = {
@@ -151,4 +180,4 @@ TEST(EvaluationTest, EmptyColumnHasNoTransitions) {
     computeEvaluationFactors(grid, factors);
 
     EXPECT_EQ(factors.totalColumnTransistions, 2);
-    }
+}
