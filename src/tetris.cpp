@@ -187,6 +187,7 @@ GameState::GameState() {
     this->currentTetrimino.xDelta = SPAWN_X_DELTA;
 
     this->nextTetrimino = Tetrimino(static_cast<TetriminoShape>(rand() % numTetriminoShapes));
+    this->nextTetrimino.xDelta = SPAWN_X_DELTA;
 }
 
 GameGrid GameState::getGrid() { return this->grid; }
@@ -196,9 +197,9 @@ bool GameState::isCurrentTetrominoPlaced() { return this->isCurrentTetriminoPlac
 
 void GameState::initNewTetrimino() { 
     this->currentTetrimino = this->nextTetrimino;
-    this->currentTetrimino.xDelta = SPAWN_X_DELTA;
 
     this->nextTetrimino = Tetrimino(static_cast<TetriminoShape>(rand() % numTetriminoShapes)); 
+    this->nextTetrimino.xDelta = SPAWN_X_DELTA;
     this->isCurrentTetriminoPlaced = false;
 
     if (this->grid.checkCollision(this->currentTetrimino.getPositions())) {
@@ -309,7 +310,7 @@ FrameDrawer::FrameDrawer() {
 
 int FrameDrawer::getHorizontalOffset(Tetrimino tetrimino) {
     int ret = 10; // arbitrary large number
-    for (auto pos : tetrimino.getPositions()) {
+    for (auto pos : tetrimino.rotationList.at(tetrimino.rotationStep)) {
         if (pos.x < ret) {
             ret = pos.x;
         }
