@@ -203,7 +203,7 @@ double computeFitness(EvaluationFactors factors) {
         factors.totalWellCells * 15.842707182438396 + 
         factors.totalColumnHoles * 26.894496507795950 + 
         factors.totalColumnTransistions * 27.616914062397015 + 
-        factors.totalRowTransitions + 30.185110719279040
+        factors.totalRowTransitions * 30.185110719279040
     );
 }
 
