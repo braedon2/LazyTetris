@@ -1,5 +1,7 @@
 #include <iostream>
 #include <cstdlib>
+#include <variant>
+#include <vector>
 #include <time.h>
 
 #include <raylib.h>
@@ -7,6 +9,7 @@
 
 #include "constants.h"
 #include "tetris.h"
+#include "solver.h"
 
 int main(void) { 
     // third party setup
@@ -18,41 +21,34 @@ int main(void) {
     GameState state;
     FrameCounter frameCounter;
     FrameDrawer frameDrawer;
-    
-    bool disableKeyDown = false;
+
+    Moves moves = solve(state.getGrid(), state.getCurrentTetrimino(), state.getNextTetrimino());
+    std::vector<Move>::iterator currentMove = moves.begin();
 
     // main gameplay loop
     while (!WindowShouldClose() and !state.gameOver) {
         frameCounter.nextFrame();
 
-        if (IsKeyPressed(KEY_RIGHT)) {
-            state.moveTetrimino(right);
+        if (IsKeyPressed(KEY_DOWN)) {
+            // decrease speed
         }
-        if (IsKeyPressed(KEY_LEFT)) {
-            state.moveTetrimino(left);
-        }
-        if (IsKeyPressed(KEY_Z)) {
-            state.rotateTetrimino(counterClockwise);
-        } 
-        if (IsKeyPressed(KEY_X)) {
-            state.rotateTetrimino(clockwise);
-        }
-        if (IsKeyDown(KEY_DOWN) and frameCounter.framesPerSoftDropCounter >= FRAMES_PER_SOFT_DROP and not disableKeyDown) {
-            state.moveTetrimino(down);
-            frameCounter.resetCounters();
-        }
-        if (IsKeyDown(KEY_DOWN) and state.isCurrentTetrominoPlaced()) {
-            disableKeyDown = true;
-        }
-        if (IsKeyReleased(KEY_DOWN) and disableKeyDown) {
-            disableKeyDown = false;
+        if (IsKeyPressed(KEY_UP)) {
+            // increase speed
         }
 
-        if (frameCounter.framesPerGridCellCounter >= FRAMES_PER_GRID_CELL) {
-            if (not state.isCurrentTetrominoPlaced()) {
-                state.moveTetrimino(down);
-                frameCounter.resetCounters();
+        if (frameCounter.framesPerGridCellCounter >= FRAMES_PER_GRID_CELL and not state.isCurrentTetrominoPlaced()) {
+            if (std::holds_alternative<Direction>(*currentMove)) {
+                state.moveTetrimino(std::get<Direction>(*currentMove));
+            } 
+            else if (std::holds_alternative<Rotation>(*currentMove)) {
+                state.rotateTetrimino(std::get<Rotation>(*currentMove));
             }
+            currentMove++;
+            
+            if (currentMove == moves.end()) {
+                state.moveTetrimino(down); // move down to lock in place
+            }
+            frameCounter.resetCounters();
         }
 
         if (state.isLineClearInProgress()) {
@@ -67,6 +63,8 @@ int main(void) {
 
         if (state.isCurrentTetrominoPlaced() and frameCounter.framesPerTetriminoResetCounter >= FRAMES_PER_TETRONIMO_RESET) {
             state.initNewTetrimino();
+            moves = solve(state.getGrid(), state.getCurrentTetrimino(), state.getNextTetrimino());
+            currentMove = moves.begin();
             frameCounter.resetCounters();
         }
 
