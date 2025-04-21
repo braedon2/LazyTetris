@@ -12,7 +12,7 @@ int main(void) {
     // third party setup
     srand(time(0));
     InitWindow(GRID_FRAME_WIDTH + 75, GRID_FRAME_HEIGHT, "Tetris");
-    SetTargetFPS(30); // my 2014 macbook gets too warm at 60 fps
+    SetTargetFPS(60); // my 2014 macbook gets too warm at 60 fps
     
     // core game logic classes
     GameState state;
