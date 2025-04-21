@@ -125,7 +125,7 @@ bool GameGrid::checkCollision(std::vector<Position> positions) {
         if (p.x < 0 or p.x >= GRID_WIDTH) {
             return true;
         }
-        if (p.y >= GRID_HEIGHT) {
+        if (p.y < 0 or p.y >= GRID_HEIGHT) {
             return true;
         }
         if (p.y >= 0 && !this->isEmpty(p)) {

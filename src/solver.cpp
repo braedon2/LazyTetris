@@ -10,9 +10,6 @@ void setNodeNeighbours(GraphNode& node, Graph& graph, GameGrid& grid) {
     if (not grid.checkCollision(node.tetrimino.move(left).getPositions())) {
         node.neighbours.push_back(&graph.at(node.tetrimino.yDelta).at(node.tetrimino.xDelta - 1).at(node.tetrimino.rotationStep));
     }
-    if (not grid.checkCollision(node.tetrimino.move(down).getPositions())) {
-        node.neighbours.push_back(&graph.at(node.tetrimino.yDelta + 1).at(node.tetrimino.xDelta).at(node.tetrimino.rotationStep));
-    }
     if (not grid.checkCollision(node.tetrimino.move(right).getPositions())) {
         node.neighbours.push_back(&graph.at(node.tetrimino.yDelta).at(node.tetrimino.xDelta + 1).at(node.tetrimino.rotationStep));
     }
@@ -22,6 +19,9 @@ void setNodeNeighbours(GraphNode& node, Graph& graph, GameGrid& grid) {
                 node.tetrimino.yDelta).at(
                     node.tetrimino.xDelta).at(
                         (node.tetrimino.rotationStep + 1) % node.tetrimino.rotationList.size()));
+    }
+    if (not grid.checkCollision(node.tetrimino.move(down).getPositions())) {
+        node.neighbours.push_back(&graph.at(node.tetrimino.yDelta + 1).at(node.tetrimino.xDelta).at(node.tetrimino.rotationStep));
     }
 }
 
@@ -198,7 +198,7 @@ void computeEvaluationFactors(GameGrid grid, EvaluationFactors& factors) {
 
 double computeFitness(EvaluationFactors factors) {
     return (
-        factors.totalLinesCleared * 1.0 +
+        factors.totalLinesCleared * -10.0 +
         factors.totalLockHeight * 12.885008263218383 +
         factors.totalWellCells * 15.842707182438396 + 
         factors.totalColumnHoles * 26.894496507795950 + 
@@ -213,8 +213,13 @@ Moves solve(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) 
     double bestFitness = -1.0;
     Graph firstGraph = makeGraph(firstTetrimino, grid);
     std::vector<GraphNode*> firstResults = search(firstGraph, firstTetrimino, grid);
+    bestResult = firstResults.at(0); // need a result to return in case all search results cause collisions
 
     for (GraphNode *firstResult : firstResults) {
+        if (grid.checkCollision(firstResult->tetrimino.getPositions())) {
+            continue;
+        }
+
         EvaluationFactors factors;
         factors.totalLockHeight = firstResult->tetrimino.getHeight();
 
@@ -227,6 +232,10 @@ Moves solve(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) 
         std::vector<GraphNode*> secondResults = search(secondGraph, secondTetrimino, gridCopy);
 
         for (GraphNode *result : secondResults) {
+            if (gridCopy.checkCollision(result->tetrimino.getPositions())) {
+                continue;
+            }
+
             factors.totalLockHeight += result->tetrimino.getHeight();
             gridCopy.setCells(result->tetrimino);
             factors.totalLinesCleared += gridCopy.getFullRows().size();
