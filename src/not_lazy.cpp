@@ -16,14 +16,14 @@ int main(void) {
     
     // core game logic classes
     GameState state;
-    FrameCounter frameCounter;
     FrameDrawer frameDrawer;
     
     bool disableKeyDown = false;
+    int frameCounter = 0;
 
     // main gameplay loop
     while (!WindowShouldClose() and !state.gameOver) {
-        frameCounter.nextFrame();
+        frameCounter++;
 
         if (IsKeyPressed(KEY_RIGHT)) {
             state.moveTetrimino(right);
@@ -37,9 +37,9 @@ int main(void) {
         if (IsKeyPressed(KEY_X)) {
             state.rotateTetrimino(clockwise);
         }
-        if (IsKeyDown(KEY_DOWN) and frameCounter.framesPerSoftDropCounter >= FRAMES_PER_SOFT_DROP and not disableKeyDown) {
+        if (IsKeyDown(KEY_DOWN) and frameCounter >= FRAMES_PER_SOFT_DROP and not disableKeyDown) {
             state.moveTetrimino(down);
-            frameCounter.resetCounters();
+            frameCounter = 0;
         }
         if (IsKeyDown(KEY_DOWN) and state.isCurrentTetrominoPlaced()) {
             disableKeyDown = true;
@@ -48,26 +48,26 @@ int main(void) {
             disableKeyDown = false;
         }
 
-        if (frameCounter.framesPerGridCellCounter >= state.fallSpeed()) {
+        if (frameCounter >= state.fallSpeed()) {
             if (not state.isCurrentTetrominoPlaced()) {
                 state.moveTetrimino(down);
-                frameCounter.resetCounters();
+                frameCounter = 0;
             }
         }
 
         if (state.isLineClearInProgress()) {
-            if (frameCounter.framesPerLineClearCounter >= FRAMES_PER_LINE_CLEAR) {
+            if (frameCounter >= FRAMES_PER_LINE_CLEAR) {
                 state.nextLineClearStep();
-                frameCounter.resetCounters();
+                frameCounter = 0;
             }
             if (not state.isLineClearInProgress()) {
                 std::cout << state.linesCleared << std::endl;
             }
         }
 
-        if (state.isCurrentTetrominoPlaced() and frameCounter.framesPerTetriminoResetCounter >= FRAMES_PER_TETRONIMO_RESET) {
+        if (state.isCurrentTetrominoPlaced() and frameCounter >= FRAMES_PER_TETRONIMO_RESET) {
             state.initNewTetrimino();
-            frameCounter.resetCounters();
+            frameCounter = 0;
         }
 
         frameDrawer.drawFrame(state);
@@ -77,10 +77,10 @@ int main(void) {
 
     // game over animation
     while (!WindowShouldClose()) {
-        frameCounter.nextFrame();
-        if (frameCounter.framesPerGameOverStepCounter >= FRAMES_PER_GAME_OVER_STEP) {
+        frameCounter++;
+        if (frameCounter >= FRAMES_PER_GAME_OVER_STEP) {
             frameDrawer.nextGameOverStep();
-            frameCounter.resetCounters();
+            frameCounter = 0;
         }
 
         frameDrawer.drawFrame(state);

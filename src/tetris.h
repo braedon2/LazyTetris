@@ -4,7 +4,6 @@
 #include <map>
 #include <vector>
 #include "raylib.h"
-#include "constants.h"
 
 class Position {
     public:
@@ -285,18 +284,6 @@ class FrameDrawer {
     FrameDrawer(); 
     void drawFrame(GameState& state);
     void nextGameOverStep();
-};
-
-class FrameCounter {
-    public:
-    int framesPerGridCellCounter = 0;
-    int framesPerSoftDropCounter = 0;
-    int framesPerTetriminoResetCounter = 0;
-    int framesPerLineClearCounter = 0;
-    int framesPerGameOverStepCounter = 0;
-
-    void nextFrame();
-    void resetCounters();
 };
 
 #endif

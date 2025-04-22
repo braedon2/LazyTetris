@@ -20,15 +20,16 @@ int main(void) {
     // core game logic classes
     GameState state;
     state.playerControlled = false;
-    FrameCounter frameCounter;
     FrameDrawer frameDrawer;
 
     Moves moves = solve(state.getGrid(), state.getCurrentTetrimino(), state.getNextTetrimino());
     std::vector<Move>::iterator currentMove = moves.begin();
 
+    int frameCounter = 0;
+
     // main gameplay loop
     while (!WindowShouldClose() and !state.gameOver) {
-        frameCounter.nextFrame();
+        frameCounter++;
 
         if (IsKeyPressed(KEY_DOWN)) {
             // decrease speed
@@ -37,36 +38,35 @@ int main(void) {
             // increase speed
         }
 
-        if (frameCounter.framesPerGridCellCounter >= FRAMES_PER_GRID_CELL and not state.isCurrentTetrominoPlaced()) {
+        if (frameCounter >= FRAMES_PER_GRID_CELL and not state.isCurrentTetrominoPlaced()) {
             if (std::holds_alternative<Direction>(*currentMove)) {
                 state.moveTetrimino(std::get<Direction>(*currentMove));
             } 
             else if (std::holds_alternative<Rotation>(*currentMove)) {
                 state.rotateTetrimino(std::get<Rotation>(*currentMove));
-            }
-            currentMove++;
-            
-            if (currentMove == moves.end()) {
+            }            
+            else if (currentMove == moves.end()) {
                 state.moveTetrimino(down); // move down to lock in place
             }
-            frameCounter.resetCounters();
+            currentMove++;
+            frameCounter = 0;
         }
 
         if (state.isLineClearInProgress()) {
-            if (frameCounter.framesPerLineClearCounter >= FRAMES_PER_LINE_CLEAR) {
+            if (frameCounter >= FRAMES_PER_LINE_CLEAR) {
                 state.nextLineClearStep();
-                frameCounter.resetCounters();
+                frameCounter = 0;
             }
             if (not state.isLineClearInProgress()) {
                 std::cout << state.linesCleared << std::endl;
             }
         }
 
-        if (state.isCurrentTetrominoPlaced() and frameCounter.framesPerTetriminoResetCounter >= FRAMES_PER_TETRONIMO_RESET) {
+        if (state.isCurrentTetrominoPlaced() and frameCounter >= FRAMES_PER_TETRONIMO_RESET) {
             state.initNewTetrimino();
             moves = solve(state.getGrid(), state.getCurrentTetrimino(), state.getNextTetrimino());
             currentMove = moves.begin();
-            frameCounter.resetCounters();
+            frameCounter = 0;
         }
 
         frameDrawer.drawFrame(state);
@@ -76,10 +76,10 @@ int main(void) {
 
     // game over animation
     while (!WindowShouldClose()) {
-        frameCounter.nextFrame();
-        if (frameCounter.framesPerGameOverStepCounter >= FRAMES_PER_GAME_OVER_STEP) {
+        frameCounter++;
+        if (frameCounter >= FRAMES_PER_GAME_OVER_STEP) {
             frameDrawer.nextGameOverStep();
-            frameCounter.resetCounters();
+            frameCounter = 0;
         }
 
         frameDrawer.drawFrame(state);

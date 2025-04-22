@@ -456,19 +456,3 @@ void FrameDrawer::nextGameOverStep() {
         this->gameOverStep++;
     }
 }
-
-void FrameCounter::nextFrame() {
-    this->framesPerGridCellCounter++;
-    this->framesPerSoftDropCounter++;
-    this->framesPerTetriminoResetCounter++;
-    this->framesPerLineClearCounter++;
-    this->framesPerGameOverStepCounter++;
-}
-
-void FrameCounter::resetCounters() {
-    this->framesPerGridCellCounter = 0;
-    this->framesPerSoftDropCounter = 0;
-    this->framesPerTetriminoResetCounter = 0;
-    this->framesPerLineClearCounter = 0;
-    this->framesPerGameOverStepCounter = 0;
-}
