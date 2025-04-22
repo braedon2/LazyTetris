@@ -104,6 +104,7 @@ Moves movesToReachSearchResult(GraphNode *searchResult) {
         node = node->prev;
     }
     std::reverse(moves.begin(), moves.end());
+    moves.push_back(down); // add a final down move to lock piece in place on the grid
     return moves;
 }
 

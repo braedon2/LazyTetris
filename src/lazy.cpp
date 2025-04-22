@@ -30,6 +30,7 @@ int main(void) {
     // main gameplay loop
     while (!WindowShouldClose() and !state.gameOver) {
         frameCounter++;
+        std::cout << frameCounter << "\n";
 
         if (IsKeyPressed(KEY_DOWN)) {
             // decrease speed
@@ -38,16 +39,13 @@ int main(void) {
             // increase speed
         }
 
-        if (frameCounter >= FRAMES_PER_GRID_CELL and not state.isCurrentTetrominoPlaced()) {
+        if (frameCounter >= state.fallSpeed() and not state.isCurrentTetrominoPlaced()) {
             if (std::holds_alternative<Direction>(*currentMove)) {
                 state.moveTetrimino(std::get<Direction>(*currentMove));
             } 
             else if (std::holds_alternative<Rotation>(*currentMove)) {
                 state.rotateTetrimino(std::get<Rotation>(*currentMove));
             }            
-            else if (currentMove == moves.end()) {
-                state.moveTetrimino(down); // move down to lock in place
-            }
             currentMove++;
             frameCounter = 0;
         }
