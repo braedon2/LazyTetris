@@ -48,7 +48,7 @@ int main(void) {
             disableKeyDown = false;
         }
 
-        if (frameCounter.framesPerGridCellCounter >= FRAMES_PER_GRID_CELL) {
+        if (frameCounter.framesPerGridCellCounter >= state.fallSpeed()) {
             if (not state.isCurrentTetrominoPlaced()) {
                 state.moveTetrimino(down);
                 frameCounter.resetCounters();

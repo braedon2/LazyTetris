@@ -19,6 +19,7 @@ int main(void) {
     
     // core game logic classes
     GameState state;
+    state.playerControlled = false;
     FrameCounter frameCounter;
     FrameDrawer frameDrawer;
 

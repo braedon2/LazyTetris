@@ -89,6 +89,25 @@ const std::map<TetriminoShape, std::vector<std::vector<Position>>> rotationListM
     }}
 };
 
+const std::map<int, int> levelSpeedMap = {
+    {0, 48},
+    {1, 43},
+    {2, 38},
+    {3, 33},
+    {4, 28},
+    {5, 23},
+    {6, 18},
+    {7, 13},
+    {8, 8},
+    {9, 6},
+    {10, 5},
+    {11, 5},
+    {12, 5},
+    {13, 4}, {14, 4}, {15, 4},
+    {16, 3}, {17, 3}, {18, 3},
+    {19, 2}, {20, 2}, {21, 2}, {22, 2}, {23, 2}, {24, 2}, {25, 2}, {26, 2}, {27, 2}, {28, 2}, {29, 2}
+};
+
 /// used by the Sprites class when generating sprites.
 /// each level has two colors.
 const std::vector<std::vector<Color>> levelColors = {
@@ -196,8 +215,10 @@ class GameState {
 
     public:
     int linesCleared = 0;
-    int level = 1;
+    int level = 0;
     bool gameOver = false;
+    bool playerControlled = true;
+    int AISpeed = 15;
 
     public:
     GameState();
@@ -206,6 +227,7 @@ class GameState {
     Tetrimino getNextTetrimino();
     bool isCurrentTetrominoPlaced();
     void initNewTetrimino();
+    int fallSpeed();
 
     /* 
     * Moves the current tetromino one cell in the given direction so long as it does not cause a 

@@ -108,7 +108,9 @@ SpriteType GameGrid::getSpriteType(Position p) {
 
 void GameGrid::setCells(Tetrimino tetrimino) {
     for (Position p : tetrimino.getPositions()) {
-        this->grid.at(p.y).at(p.x) = GridCell(tetrimino.getSpriteType(), false);
+        if (p.x >= 0 and p.x < GRID_WIDTH and p.y >= 0 and p.y < GRID_HEIGHT) {
+            this->grid.at(p.y).at(p.x) = GridCell(tetrimino.getSpriteType(), false);
+        }
     }
 }
 
@@ -125,10 +127,10 @@ bool GameGrid::checkCollision(std::vector<Position> positions) {
         if (p.x < 0 or p.x >= GRID_WIDTH) {
             return true;
         }
-        if (p.y < 0 or p.y >= GRID_HEIGHT) {
+        if (p.y >= GRID_HEIGHT) {
             return true;
         }
-        if (p.y >= 0 && !this->isEmpty(p)) {
+        if (p.y >= 0 and !this->isEmpty(p)) {
             return true;
         }
     }
@@ -207,6 +209,20 @@ void GameState::initNewTetrimino() {
     }
 }
 
+int GameState::fallSpeed() {
+    if (playerControlled) {
+        if (level < 30) {
+            return levelSpeedMap.at(this->level);
+        }
+        else {
+            return 1;
+        }
+    }
+    else {
+        return this->AISpeed;
+    }
+}
+
 void GameState::moveTetrimino(Direction direction) {
     // tetromino can no longer be moved so command is ignored
     if (this->isCurrentTetriminoPlaced) {
@@ -255,7 +271,7 @@ void GameState::nextLineClearStep() {
     // update a bunch of state after the line clear is finished
     if (this->lineClearStep == GRID_WIDTH / 2) {
         // update level if enough lines have been cleared
-        if (this->linesCleared + int(this->linesToClear.size()) >= this->level * LINE_CLEARS_PER_LEVEL) {
+        if (this->linesCleared + int(this->linesToClear.size()) >= (this->level + 1) * LINE_CLEARS_PER_LEVEL) {
             this->level++;
         }
 
@@ -300,7 +316,7 @@ Texture2D Sprites::generateSprite(int pixelLayoutIndex, Color color) {
 }
 
 Texture2D Sprites::getSprite(SpriteType spriteType, int level) {
-    return this->sprites.at((level - 1) % this->sprites.size()).at(spriteType);
+    return this->sprites.at((level) % this->sprites.size()).at(spriteType);
 }
 
 FrameDrawer::FrameDrawer() {
@@ -406,8 +422,8 @@ void FrameDrawer::drawSideBar(GameState& state) {
 }
 
 void FrameDrawer::drawGameOver(int level) {
-    Color color1 = levelColors.at((level - 1) % levelColors.size()).at(0);
-    Color color2 = levelColors.at((level - 1) % levelColors.size()).at(1);
+    Color color1 = levelColors.at((level) % levelColors.size()).at(0);
+    Color color2 = levelColors.at((level) % levelColors.size()).at(1);
 
     for (int i = 0; i < this->gameOverStep; i++) {
         int y1 = (i * BLOCK_SIZE) + (i * GAP_SIZE);
