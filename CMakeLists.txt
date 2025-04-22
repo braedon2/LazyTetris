@@ -60,7 +60,21 @@ target_link_libraries(
 # Make main find the <raylib.h> header (and others)
 target_include_directories(not_lazy PUBLIC "${raylib_SOURCE_DIR}/src")
 
-include_directories(src)
+add_executable(
+  lazy_no_animation 
+  src/lazy_no_animation.cpp 
+  src/tetris.cpp 
+  src/solver.cpp
+)
+
+# Link raylib to main
+target_link_libraries(
+    lazy_no_animation  
+    raylib
+)
+# Make main find the <raylib.h> header (and others)
+target_include_directories(lazy_no_animation  PUBLIC "${raylib_SOURCE_DIR}/src")
+
 add_executable(
   lazy 
   src/lazy.cpp 

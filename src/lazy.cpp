@@ -30,7 +30,6 @@ int main(void) {
     // main gameplay loop
     while (!WindowShouldClose() and !state.gameOver) {
         frameCounter++;
-        std::cout << frameCounter << "\n";
 
         if (IsKeyPressed(KEY_DOWN)) {
             // decrease speed

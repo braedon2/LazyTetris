@@ -1,6 +1,6 @@
 #include <algorithm>
 #include <queue>
-#include <variant>
+#include <iostream>
 #include <vector>
 #include "constants.h"
 #include "tetris.h"
@@ -253,4 +253,51 @@ Moves solve(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) 
     }
 
     return movesToReachSearchResult(bestResult);
+}
+
+
+Tetrimino solveForFinalPos(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) {
+    GraphNode *bestResult;
+    double bestFitness = -1.0;
+    Graph firstGraph = makeGraph(firstTetrimino, grid);
+    std::vector<GraphNode*> firstResults = search(firstGraph, firstTetrimino, grid);
+    bestResult = firstResults.at(0); // need a result to return in case all search results cause collisions
+
+    for (GraphNode *firstResult : firstResults) {
+        if (grid.checkCollision(firstResult->tetrimino.getPositions())) {
+            continue;
+        }
+
+        EvaluationFactors factors;
+        factors.totalLockHeight = firstResult->tetrimino.getHeight();
+
+        GameGrid gridCopy = grid;
+        gridCopy.setCells(firstResult->tetrimino);
+        factors.totalLinesCleared = gridCopy.getFullRows().size();
+        gridCopy.clearRows(gridCopy.getFullRows());
+
+        Graph secondGraph = makeGraph(secondTetrimino, gridCopy);
+        std::vector<GraphNode*> secondResults = search(secondGraph, secondTetrimino, gridCopy);
+
+        for (GraphNode *result : secondResults) {
+            if (gridCopy.checkCollision(result->tetrimino.getPositions())) {
+                continue;
+            }
+
+            factors.totalLockHeight += result->tetrimino.getHeight();
+            gridCopy.setCells(result->tetrimino);
+            factors.totalLinesCleared += gridCopy.getFullRows().size();
+            gridCopy.clearRows(gridCopy.getFullRows());
+
+            computeEvaluationFactors(gridCopy, factors);
+            double fitness = computeFitness(factors);
+            
+            if (bestFitness < 0 or fitness < bestFitness) {
+                bestFitness = fitness;
+                bestResult = firstResult;
+            }
+        }
+    }
+
+    return bestResult->tetrimino;
 }

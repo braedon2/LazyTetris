@@ -270,16 +270,19 @@ void GameState::nextLineClearStep() {
 
     // update a bunch of state after the line clear is finished
     if (this->lineClearStep == GRID_WIDTH / 2) {
-        // update level if enough lines have been cleared
-        if (this->linesCleared + int(this->linesToClear.size()) >= (this->level + 1) * LINE_CLEARS_PER_LEVEL) {
-            this->level++;
-        }
-
-        this->linesCleared += this->linesToClear.size();
-        this->grid.clearRows(this->linesToClear);
-        this->lineClearStep = 0;
-        this->linesToClear.clear();
+        this->clearFullLines();
     }
+}
+
+void GameState::clearFullLines() {
+    if (this->linesCleared + int(this->linesToClear.size()) >= (this->level + 1) * LINE_CLEARS_PER_LEVEL) {
+        this->level++;
+    }
+
+    this->linesCleared += this->linesToClear.size();
+    this->grid.clearRows(this->linesToClear);
+    this->lineClearStep = 0;
+    this->linesToClear.clear();
 }
 
 Sprites::Sprites() {
@@ -438,10 +441,12 @@ void FrameDrawer::drawGameOver(int level) {
     }
 }
 
-void FrameDrawer::drawFrame(GameState& state) {
+void FrameDrawer::drawFrame(GameState& state, bool drawCurrentTetrimino) {
     BeginDrawing();
         ClearBackground(BLACK);
-        this->drawCurrentTetrimino(state);
+        if (drawCurrentTetrimino) {
+            this->drawCurrentTetrimino(state);
+        }
         this->drawGridCells(state);
         this->drawSideBar(state);
 

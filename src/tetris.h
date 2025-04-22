@@ -204,8 +204,7 @@ class GameState {
     * - linesToClear: used for animating line clears. Grid indices of rows being cleared
     * - lineClearStep: current step in the row clear animation
     */
-    private:
-    GameGrid grid;
+    public:
     Tetrimino currentTetrimino = Tetrimino(T); // replaced with random tetrimino in constructor
     Tetrimino nextTetrimino = Tetrimino(T); // replacedw tih random tetrimino in constructor
     bool isCurrentTetriminoPlaced = false;
@@ -213,11 +212,12 @@ class GameState {
     int lineClearStep = 0; 
 
     public:
+    GameGrid grid;
     int linesCleared = 0;
     int level = 0;
     bool gameOver = false;
     bool playerControlled = true;
-    int AISpeed = 15;
+    int AISpeed = 1;
 
     public:
     GameState();
@@ -252,6 +252,8 @@ class GameState {
     // Advances the row clear animation.
     // Unsets the rowsToClear and rowClearStep attributes when the animation is finished
     void nextLineClearStep();
+
+    void clearFullLines();
 };
 
 
@@ -282,7 +284,7 @@ class FrameDrawer {
 
     public:
     FrameDrawer(); 
-    void drawFrame(GameState& state);
+    void drawFrame(GameState& state, bool drawCurrentTetrimino = true);
     void nextGameOverStep();
 };
 

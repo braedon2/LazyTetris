@@ -35,5 +35,6 @@ void computeEvaluationFactors(GameGrid grid, EvaluationFactors& factors);
 double computeFitness(EvaluationFactors factors);
 
 Moves solve(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino);
+Tetrimino solveForFinalPos(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino);
 
 #endif
