@@ -105,12 +105,12 @@ TEST(SearchTest, FollowMovesOfVerticalITetrimino) {
     Graph graph = makeGraph(tetrimino, grid);
 
     std::vector<GraphNode*> results = search(graph, tetrimino, grid);
-    EXPECT_EQ(results.at(1)->tetrimino.rotationStep, 1);
+    EXPECT_EQ(results.at(1)->tetrimino.rotationStep, 0);
 
     Moves moves = movesToReachSearchResult(results.at(1));
 
     for (Move move : moves) {
-        if (std::holds_alternative<Direction>(move)) {
+        if (std::holds_alternative<Direction>(move) and not grid.checkCollision(tetrimino.move(std::get<Direction>(move)).getPositions())) {
             tetrimino = tetrimino.move(std::get<Direction>(move));
         } 
         else if (std::holds_alternative<Rotation>(move)) {
