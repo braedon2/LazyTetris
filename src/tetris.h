@@ -187,7 +187,7 @@ class GameGrid {
     void setCells(Tetrimino tetrimino);
     void setCell(Position position, SpriteType spriteType);
     void clearCell(Position p);
-    bool checkCollision(std::vector<Position> positions);
+    bool checkCollision(Tetrimino tetrimino);
     std::vector<int> getFullRows();
     void clearRows(std::vector<int> row_indexes);
     void print();

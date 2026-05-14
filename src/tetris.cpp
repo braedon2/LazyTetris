@@ -122,15 +122,21 @@ void GameGrid::clearCell(Position p) {
     this->grid[p.y][p.x] = GridCell(none, true);
 }
 
-bool GameGrid::checkCollision(std::vector<Position> positions) {
-    for (auto p : positions) {
-        if (p.x < 0 or p.x >= GRID_WIDTH) {
+bool GameGrid::checkCollision(Tetrimino tetrimino) {
+    int x = 0;
+    int y = 0;
+
+    for (Position p : tetrimino.rotationList.at(tetrimino.rotationStep)) {
+        x = p.x + tetrimino.xDelta;
+        y = p.y + tetrimino.yDelta;
+
+        if (x < 0 or x >= GRID_WIDTH) {
             return true;
         }
-        if (p.y >= GRID_HEIGHT) {
+        if (y >= GRID_HEIGHT) {
             return true;
         }
-        if (p.y >= 0 and !this->isEmpty(p)) {
+        if (y >= 0 and !this->grid.at(y).at(x).isEmpty) {
             return true;
         }
     }
@@ -204,7 +210,7 @@ void GameState::initNewTetrimino() {
     this->nextTetrimino.xDelta = SPAWN_X_DELTA;
     this->isCurrentTetriminoPlaced = false;
 
-    if (this->grid.checkCollision(this->currentTetrimino.getPositions())) {
+    if (this->grid.checkCollision(this->currentTetrimino)) {
         this->gameOver = true;
     }
 }
@@ -231,7 +237,7 @@ void GameState::moveTetrimino(Direction direction) {
 
     if (direction == down) {
         Tetrimino tmpTetrimino = this->currentTetrimino.move(down);
-        if (this->grid.checkCollision(tmpTetrimino.getPositions())) {
+        if (this->grid.checkCollision(tmpTetrimino)) {
             for (auto p : this->currentTetrimino.getPositions()) {
                 this->grid.setCells(this->currentTetrimino);
             }
@@ -244,7 +250,7 @@ void GameState::moveTetrimino(Direction direction) {
     }
     else { // direction is left or right
         Tetrimino tmpTetrimino = this->currentTetrimino.move(direction);
-        if (not this->grid.checkCollision(tmpTetrimino.getPositions())) {
+        if (not this->grid.checkCollision(tmpTetrimino)) {
             this->currentTetrimino = tmpTetrimino;
         }
     }
@@ -252,7 +258,7 @@ void GameState::moveTetrimino(Direction direction) {
 
 void GameState::rotateTetrimino(Rotation rotation) {
     Tetrimino tmpTetrimino = this->currentTetrimino.rotate(rotation);
-    if (not this->grid.checkCollision(tmpTetrimino.getPositions())) {
+    if (not this->grid.checkCollision(tmpTetrimino)) {
         this->currentTetrimino = tmpTetrimino;
     }
 }

@@ -7,20 +7,20 @@
 #include "solver.h"
 
 void setNodeNeighbours(GraphNode& node, Graph& graph, GameGrid& grid) {
-    if (not grid.checkCollision(node.tetrimino.move(left).getPositions())) {
+    if (not grid.checkCollision(node.tetrimino.move(left))) {
         node.neighbours.push_back(&graph.at(node.tetrimino.yDelta).at(node.tetrimino.xDelta - 1).at(node.tetrimino.rotationStep));
     }
-    if (not grid.checkCollision(node.tetrimino.move(right).getPositions())) {
+    if (not grid.checkCollision(node.tetrimino.move(right))) {
         node.neighbours.push_back(&graph.at(node.tetrimino.yDelta).at(node.tetrimino.xDelta + 1).at(node.tetrimino.rotationStep));
     }
-    if (not grid.checkCollision(node.tetrimino.rotate(clockwise).getPositions())) {
+    if (not grid.checkCollision(node.tetrimino.rotate(clockwise))) {
         node.neighbours.push_back(
             &graph.at(
                 node.tetrimino.yDelta).at(
                     node.tetrimino.xDelta).at(
                         (node.tetrimino.rotationStep + 1) % node.tetrimino.rotationList.size()));
     }
-    if (not grid.checkCollision(node.tetrimino.move(down).getPositions())) {
+    if (not grid.checkCollision(node.tetrimino.move(down))) {
         node.neighbours.push_back(&graph.at(node.tetrimino.yDelta + 1).at(node.tetrimino.xDelta).at(node.tetrimino.rotationStep));
     }
 }
@@ -68,7 +68,7 @@ std::vector<GraphNode*> search(Graph& graph, Tetrimino& tetrimino, GameGrid& gri
         GraphNode *node = queue.front();
         queue.pop();
 
-        if (grid.checkCollision(node->tetrimino.move(down).getPositions())) {
+        if (grid.checkCollision(node->tetrimino.move(down))) {
             results.push_back(node);
         }
 
@@ -217,7 +217,7 @@ Moves solve(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) 
     bestResult = firstResults.at(0); // need a result to return in case all search results cause collisions
 
     for (GraphNode *firstResult : firstResults) {
-        if (grid.checkCollision(firstResult->tetrimino.getPositions())) {
+        if (grid.checkCollision(firstResult->tetrimino)) {
             continue;
         }
 
@@ -233,7 +233,7 @@ Moves solve(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) 
         std::vector<GraphNode*> secondResults = search(secondGraph, secondTetrimino, gridCopy);
 
         for (GraphNode *result : secondResults) {
-            if (gridCopy.checkCollision(result->tetrimino.getPositions())) {
+            if (gridCopy.checkCollision(result->tetrimino)) {
                 continue;
             }
 
@@ -264,7 +264,7 @@ Tetrimino solveForFinalPos(GameGrid grid, Tetrimino firstTetrimino, Tetrimino se
     bestResult = firstResults.at(0); // need a result to return in case all search results cause collisions
 
     for (GraphNode *firstResult : firstResults) {
-        if (grid.checkCollision(firstResult->tetrimino.getPositions())) {
+        if (grid.checkCollision(firstResult->tetrimino)) {
             continue;
         }
 
@@ -280,7 +280,7 @@ Tetrimino solveForFinalPos(GameGrid grid, Tetrimino firstTetrimino, Tetrimino se
         std::vector<GraphNode*> secondResults = search(secondGraph, secondTetrimino, gridCopy);
 
         for (GraphNode *result : secondResults) {
-            if (gridCopy.checkCollision(result->tetrimino.getPositions())) {
+            if (gridCopy.checkCollision(result->tetrimino)) {
                 continue;
             }
 
