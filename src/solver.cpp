@@ -7,21 +7,31 @@
 #include "solver.h"
 
 void setNodeNeighbours(GraphNode& node, Graph& graph, GameGrid& grid) {
-    if (not grid.checkCollision(node.tetrimino.move(left))) {
-        node.neighbours.push_back(&graph.at(node.tetrimino.yDelta).at(node.tetrimino.xDelta - 1).at(node.tetrimino.rotationStep));
+    // hot path optimization: this function gets called a lot so instead of using tetrimino.move which makes a copy,
+    // a copy of the node tetrimino is made and its state is modified directly
+    Tetrimino tetriminoCopy(node.tetrimino.shape, node.tetrimino.xDelta, node.tetrimino.yDelta, node.tetrimino.rotationStep);
+
+    tetriminoCopy.xDelta -= 1; // move left
+    if (not grid.checkCollision(tetriminoCopy)) {
+        node.neighbours.push_back(&graph.at(tetriminoCopy.yDelta).at(tetriminoCopy.xDelta).at(tetriminoCopy.rotationStep));
     }
-    if (not grid.checkCollision(node.tetrimino.move(right))) {
-        node.neighbours.push_back(&graph.at(node.tetrimino.yDelta).at(node.tetrimino.xDelta + 1).at(node.tetrimino.rotationStep));
+
+    tetriminoCopy.xDelta += 2; // move right
+    if (not grid.checkCollision(tetriminoCopy)) {
+        node.neighbours.push_back(&graph.at(tetriminoCopy.yDelta).at(tetriminoCopy.xDelta).at(tetriminoCopy.rotationStep));
     }
-    if (not grid.checkCollision(node.tetrimino.rotate(clockwise))) {
-        node.neighbours.push_back(
-            &graph.at(
-                node.tetrimino.yDelta).at(
-                    node.tetrimino.xDelta).at(
-                        (node.tetrimino.rotationStep + 1) % node.tetrimino.rotationList.size()));
+
+    tetriminoCopy.xDelta -= 1; // undo move right
+    int oldRotationStep = tetriminoCopy.rotationStep;
+    tetriminoCopy.rotationStep = (tetriminoCopy.rotationStep + 1) % tetriminoCopy.rotationList.size();
+    if (not grid.checkCollision(tetriminoCopy)) {
+        node.neighbours.push_back(&graph.at(tetriminoCopy.yDelta).at(tetriminoCopy.xDelta).at(tetriminoCopy.rotationStep));
     }
-    if (not grid.checkCollision(node.tetrimino.move(down))) {
-        node.neighbours.push_back(&graph.at(node.tetrimino.yDelta + 1).at(node.tetrimino.xDelta).at(node.tetrimino.rotationStep));
+    tetriminoCopy.rotationStep = oldRotationStep; // restore rotation step
+
+    tetriminoCopy.yDelta += 1; // move down
+    if (not grid.checkCollision(tetriminoCopy)) {
+        node.neighbours.push_back(&graph.at(tetriminoCopy.yDelta).at(tetriminoCopy.xDelta).at(tetriminoCopy.rotationStep));
     }
 }
 

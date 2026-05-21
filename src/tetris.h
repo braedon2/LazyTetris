@@ -52,7 +52,7 @@ const std::map<TetriminoShape,SpriteType> spriteTypeMap = {
 ///   0
 ///  00
 ///   0
-const std::map<TetriminoShape, std::vector<std::vector<Position>>> rotationListMap = {
+inline std::map<TetriminoShape, std::vector<std::vector<Position>>> rotationListMap = {
     { T, { 
         {{-1,0}, {0,0}, {1,0}, {0,1}},
         {{0,-1}, {-1,0}, {0,0}, {0,1}},
@@ -187,7 +187,8 @@ class GameGrid {
     void setCells(Tetrimino tetrimino);
     void setCell(Position position, SpriteType spriteType);
     void clearCell(Position p);
-    bool checkCollision(Tetrimino tetrimino);
+    //bool checkCollision(Tetrimino&& tetrimino); // For convenience. Allows for grid.checkCollision(tetrimino.move(left))
+    bool checkCollision(const Tetrimino& tetrimino);
     std::vector<int> getFullRows();
     void clearRows(std::vector<int> row_indexes);
     void print();

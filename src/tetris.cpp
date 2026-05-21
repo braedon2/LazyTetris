@@ -122,11 +122,12 @@ void GameGrid::clearCell(Position p) {
     this->grid[p.y][p.x] = GridCell(none, true);
 }
 
-bool GameGrid::checkCollision(Tetrimino tetrimino) {
+bool GameGrid::checkCollision(const Tetrimino& tetrimino) {
     int x = 0;
     int y = 0;
 
-    for (Position p : tetrimino.rotationList.at(tetrimino.rotationStep)) {
+    // TODO make an iterator
+    for (Position p : tetrimino.rotationList[tetrimino.rotationStep]) {
         x = p.x + tetrimino.xDelta;
         y = p.y + tetrimino.yDelta;
 
@@ -136,7 +137,7 @@ bool GameGrid::checkCollision(Tetrimino tetrimino) {
         if (y >= GRID_HEIGHT) {
             return true;
         }
-        if (y >= 0 and !this->grid.at(y).at(x).isEmpty) {
+        if (y >= 0 and !this->grid[y][x].isEmpty) {
             return true;
         }
     }
