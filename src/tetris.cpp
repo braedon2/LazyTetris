@@ -15,7 +15,7 @@
 
 Tetrimino::Tetrimino(TetriminoShape shape) {
     this->shape = shape;
-    this->rotationList = rotationListMap.at(shape);
+    this->rotationList = &rotationListMap.at(shape);
     this->xDelta = 0;
     this->yDelta = 0;
     this->rotationStep = 0;
@@ -23,15 +23,15 @@ Tetrimino::Tetrimino(TetriminoShape shape) {
 
 Tetrimino::Tetrimino(TetriminoShape shape, int xDelta, int yDelta, int rotationStep) {
     this->shape = shape;
-    this->rotationList = rotationListMap.at(shape);
+    this->rotationList = &rotationListMap.at(shape);
     this->xDelta = xDelta;
     this->yDelta = yDelta;
-    this->rotationStep = rotationStep % this->rotationList.size();
+    this->rotationStep = rotationStep % this->rotationList->size();
 }
 
 std::vector<Position> Tetrimino::getPositions() {
     std::vector<Position> positions;
-    for (Position p : this->rotationList.at(this->rotationStep)) {
+    for (Position p : this->rotationList->at(this->rotationStep)) {
         positions.push_back({p.x + this->xDelta, p.y + this->yDelta});
     }
     return positions;
@@ -52,10 +52,10 @@ Tetrimino Tetrimino::move(Direction direction) {
 Tetrimino Tetrimino::rotate(Rotation rotation) {
     int rotationStep;
     if (rotation == clockwise) {
-        rotationStep = (this->rotationStep + 1) % this->rotationList.size();
+        rotationStep = (this->rotationStep + 1) % this->rotationList->size();
     }
     else { // rotation == counterClockwise
-        rotationStep = (this->rotationStep - 1) % this->rotationList.size();
+        rotationStep = (this->rotationStep - 1) % this->rotationList->size();
     }
     return Tetrimino(this->shape, this->xDelta, this->yDelta, rotationStep);
 }
@@ -66,7 +66,7 @@ SpriteType Tetrimino::getSpriteType() {
 
 int Tetrimino::getHeight() {
     int height = 100; // arbitrary big number
-    for (Position p : this->rotationList.at(this->rotationStep)) {
+    for (Position p : this->rotationList->at(this->rotationStep)) {
         // coordinates start in top left but height is considered from the bottom so we subtract
         if (GRID_HEIGHT - 1 - (p.y + this->yDelta) < height) {
             height = GRID_HEIGHT - 1 - (p.y + this->yDelta);
@@ -127,7 +127,7 @@ bool GameGrid::checkCollision(const Tetrimino& tetrimino) {
     int y = 0;
 
     // TODO make an iterator
-    for (Position p : tetrimino.rotationList[tetrimino.rotationStep]) {
+    for (Position p : (*tetrimino.rotationList)[tetrimino.rotationStep]) {
         x = p.x + tetrimino.xDelta;
         y = p.y + tetrimino.yDelta;
 
@@ -336,7 +336,7 @@ FrameDrawer::FrameDrawer() {
 
 int FrameDrawer::getHorizontalOffset(Tetrimino tetrimino) {
     int ret = 10; // arbitrary large number
-    for (auto pos : tetrimino.rotationList.at(tetrimino.rotationStep)) {
+    for (auto pos : tetrimino.rotationList->at(tetrimino.rotationStep)) {
         if (pos.x < ret) {
             ret = pos.x;
         }

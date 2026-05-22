@@ -23,7 +23,7 @@ void setNodeNeighbours(GraphNode& node, Graph& graph, GameGrid& grid) {
 
     tetriminoCopy.xDelta -= 1; // undo move right
     int oldRotationStep = tetriminoCopy.rotationStep;
-    tetriminoCopy.rotationStep = (tetriminoCopy.rotationStep + 1) % tetriminoCopy.rotationList.size();
+    tetriminoCopy.rotationStep = (tetriminoCopy.rotationStep + 1) % tetriminoCopy.rotationList->size();
     if (not grid.checkCollision(tetriminoCopy)) {
         node.neighbours.push_back(&graph.at(tetriminoCopy.yDelta).at(tetriminoCopy.xDelta).at(tetriminoCopy.rotationStep));
     }
@@ -42,7 +42,7 @@ Graph makeGraph(Tetrimino& tetrimino, GameGrid& grid) {
         graph.push_back(std::vector<std::vector<GraphNode>>());
         for (int j = 0; j < GRID_WIDTH; j++) {
             graph.at(i).push_back(std::vector<GraphNode>());
-            for (int rotation = 0; rotation < tetrimino.rotationList.size(); rotation++) {
+            for (int rotation = 0; rotation < tetrimino.rotationList->size(); rotation++) {
                 GraphNode node = {
                     Tetrimino(tetrimino.shape, j, i, rotation),
                     false, // visited

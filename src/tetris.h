@@ -158,7 +158,7 @@ class GridCell {
 /// for a collision before commiting to it
 class Tetrimino {
     public:
-    std::vector<std::vector<Position>> rotationList;
+    std::vector<std::vector<Position>>* rotationList;
     int xDelta;
     int yDelta;
     int rotationStep;
