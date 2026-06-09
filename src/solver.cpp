@@ -70,8 +70,7 @@ std::vector<GraphNode*> search(Graph& graph, Tetrimino& tetrimino, GameGrid& gri
     std::vector<GraphNode*> results;
 
     GraphNode& root = graph.at(tetrimino.yDelta).at(tetrimino.xDelta).at(tetrimino.rotationStep);
-    root.visited = true;
-    //setNodeNeighbours(root, graph, grid);   
+    root.visited = true;  
     queue.push(&root);
 
     while (not queue.empty()) {
