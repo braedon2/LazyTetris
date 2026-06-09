@@ -110,7 +110,7 @@ TEST(SearchTest, FollowMovesOfVerticalITetrimino) {
     Moves moves = movesToReachSearchResult(results.at(1));
 
     for (Move move : moves) {
-        if (std::holds_alternative<Direction>(move) and not grid.checkCollision(tetrimino.move(std::get<Direction>(move)).getPositions())) {
+        if (std::holds_alternative<Direction>(move) and not grid.checkCollision(tetrimino.move(std::get<Direction>(move)))) {
             tetrimino = tetrimino.move(std::get<Direction>(move));
         } 
         else if (std::holds_alternative<Rotation>(move)) {
