@@ -34,6 +34,7 @@ Moves movesToReachSearchResult(GraphNode* searchResult);
 void computeEvaluationFactors(GameGrid grid, EvaluationFactors& factors);
 double computeFitness(EvaluationFactors factors);
 
+GraphNode* solve(Graph& firstTetriminoGraph, GameGrid& grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino);
 Moves solveForMovesToOptimalTetrimino(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino);
 Tetrimino solveForOptimalTetrimino(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino);
 
