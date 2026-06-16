@@ -171,6 +171,10 @@ void GameGrid::clearRows(std::vector<int> row_indices) {
     }
 }
 
+void GameGrid::clearFullRows() {
+    this->clearRows(this->getFullRows());
+}
+
 void GameGrid::print() {
     std::string reset = "\033[0m";
     std::string red = "\033[31m";

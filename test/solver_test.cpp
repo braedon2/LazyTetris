@@ -143,7 +143,7 @@ TEST(SearchTest, VisualizeAllTwoTetriminoCombinations) {
         GameGrid gridCopy = grid;
         gridCopy.setCells(firstResult->tetrimino);
         int firstTetriminoLineClears = gridCopy.getFullRows().size();
-        gridCopy.clearRows(gridCopy.getFullRows());
+        gridCopy.clearFullRows();
 
         Graph secondGraph = makeGraph(secondTetrimino, gridCopy);
         std::vector<GraphNode*> secondResults = search(secondGraph, secondTetrimino, gridCopy);
@@ -155,7 +155,7 @@ TEST(SearchTest, VisualizeAllTwoTetriminoCombinations) {
             factors.totalLockHeight = firstTetriminoLockHeight + secondResult->tetrimino.getHeight();
             secondGridCopy.setCells(secondResult->tetrimino);
             factors.totalLinesCleared = firstTetriminoLineClears + secondGridCopy.getFullRows().size();
-            secondGridCopy.clearRows(secondGridCopy.getFullRows());
+            secondGridCopy.clearFullRows();
             secondGridCopy.print();
 
             computeEvaluationFactors(secondGridCopy, factors);

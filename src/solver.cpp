@@ -233,7 +233,7 @@ GraphNode* solve(Graph& firstTetriminoGraph, GameGrid& grid, Tetrimino firstTetr
         GameGrid gridCopy = grid;
         gridCopy.setCells(firstResult->tetrimino);
         int firstTetriminoLineClears = gridCopy.getFullRows().size();
-        gridCopy.clearRows(gridCopy.getFullRows());
+        gridCopy.clearFullRows();
 
         Graph secondGraph = makeGraph(secondTetrimino, gridCopy);
         std::vector<GraphNode*> secondResults = search(secondGraph, secondTetrimino, gridCopy);
@@ -248,7 +248,7 @@ GraphNode* solve(Graph& firstTetriminoGraph, GameGrid& grid, Tetrimino firstTetr
             factors.totalLockHeight = firstTetriminoLockHeight + result->tetrimino.getHeight();
             secondGridCopy.setCells(result->tetrimino);
             factors.totalLinesCleared = firstTetriminoLineClears + gridCopy.getFullRows().size();
-            secondGridCopy.clearRows(gridCopy.getFullRows());
+            secondGridCopy.clearFullRows();
 
             computeEvaluationFactors(secondGridCopy, factors);
             double fitness = computeFitness(factors);
