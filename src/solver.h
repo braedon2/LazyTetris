@@ -8,7 +8,7 @@
 struct GraphNode {
     Tetrimino tetrimino;
     bool visited = false;
-    GraphNode *prev;
+    GraphNode* prev;
     std::vector<GraphNode*> neighbours;
 };
 
@@ -29,7 +29,7 @@ typedef std::vector<Move> Moves;
 void setNodeNeighbours(GraphNode& node, Graph& graph, GameGrid& grid);
 Graph makeGraph(Tetrimino& tetrimino, GameGrid& grid);
 std::vector<GraphNode*> search(Graph &graph, Tetrimino& tetrimino, GameGrid& grid);
-Moves movesToReachSearchResult(GraphNode *searchResult);
+Moves movesToReachSearchResult(GraphNode* searchResult);
 
 void computeEvaluationFactors(GameGrid grid, EvaluationFactors& factors);
 double computeFitness(EvaluationFactors factors);

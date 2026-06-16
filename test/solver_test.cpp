@@ -16,7 +16,7 @@ TEST(SearchTest, EmptyGridWithOTetrimino) {
     grid.print();
 
     // print all the search results
-    for (GraphNode *node : results) {
+    for (GraphNode* node : results) {
         std::cout << "\n" << std::endl;
         GameGrid newGrid = grid;
         newGrid.setCells(node->tetrimino);
@@ -24,7 +24,7 @@ TEST(SearchTest, EmptyGridWithOTetrimino) {
     }
 
     // follow a node's prev pointers all the way to the root node
-    GraphNode *node = results.at(0);
+    GraphNode* node = results.at(0);
     while (node->prev != nullptr) {
         node = node->prev;
     }
@@ -46,7 +46,7 @@ TEST(SearchTest, EmptyGridWithITetrimino) {
     grid.print();
 
     // print all the search results
-    for (GraphNode *node : results) {
+    for (GraphNode* node : results) {
         std::cout << "\n" << std::endl;
         GameGrid newGrid = grid;
         newGrid.setCells(node->tetrimino);
@@ -54,7 +54,7 @@ TEST(SearchTest, EmptyGridWithITetrimino) {
     }
 
     // follow a node's prev pointers all the way to the root node
-    GraphNode *node = results.at(0);
+    GraphNode* node = results.at(0);
     while (node->prev != nullptr) {
         node = node->prev;
     }
@@ -84,7 +84,7 @@ TEST(SearchTest, NonEmptyGridSlideIntoPlace) {
 
     // print all the search results, look for one that slid into place
     bool found = false;
-    for (GraphNode *node : results) {
+    for (GraphNode* node : results) {
         std::cout << "\n" << std::endl;
         GameGrid newGrid = grid;
         newGrid.setCells(node->tetrimino);

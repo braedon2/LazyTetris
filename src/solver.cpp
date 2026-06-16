@@ -73,14 +73,14 @@ std::vector<GraphNode*> search(Graph& graph, Tetrimino& tetrimino, GameGrid& gri
     queue.push(&root);
 
     while (not queue.empty()) {
-        GraphNode *node = queue.front();
+        GraphNode* node = queue.front();
         queue.pop();
 
         if (grid.checkCollision(node->tetrimino.move(down))) {
             results.push_back(node);
         }
 
-        for (GraphNode *neighbour : node->neighbours) {
+        for (GraphNode* neighbour : node->neighbours) {
             if (not neighbour->visited) {
                 neighbour->visited = true;
                 neighbour->prev = node;
@@ -92,8 +92,8 @@ std::vector<GraphNode*> search(Graph& graph, Tetrimino& tetrimino, GameGrid& gri
 }
 
 
-Moves movesToReachSearchResult(GraphNode *searchResult) {
-    GraphNode *node = searchResult;
+Moves movesToReachSearchResult(GraphNode* searchResult) {
+    GraphNode* node = searchResult;
     Moves moves; // iterating from locked position to spawn point means this will need to be reversed before returning
 
     while (node->prev != nullptr) {
@@ -218,12 +218,12 @@ double computeFitness(EvaluationFactors factors) {
 
 
 GraphNode* solve(Graph& firstTetriminoGraph, GameGrid& grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) {
-    GraphNode *bestResult;
+    GraphNode* bestResult;
     double bestFitness = -1.0;
     std::vector<GraphNode*> firstResults = search(firstTetriminoGraph, firstTetrimino, grid);
     bestResult = firstResults.at(0); // need a result to return in case all search results cause collisions
 
-    for (GraphNode *firstResult : firstResults) {
+    for (GraphNode* firstResult : firstResults) {
         if (grid.checkCollision(firstResult->tetrimino)) {
             continue;
         }
@@ -238,15 +238,15 @@ GraphNode* solve(Graph& firstTetriminoGraph, GameGrid& grid, Tetrimino firstTetr
         Graph secondGraph = makeGraph(secondTetrimino, gridCopy);
         std::vector<GraphNode*> secondResults = search(secondGraph, secondTetrimino, gridCopy);
 
-        for (GraphNode *result : secondResults) {
-            if (gridCopy.checkCollision(result->tetrimino)) {
+        for (GraphNode* secondResult : secondResults) {
+            if (gridCopy.checkCollision(secondResult->tetrimino)) {
                 continue;
             }
 
             EvaluationFactors factors;
             GameGrid secondGridCopy = gridCopy;
-            factors.totalLockHeight = firstTetriminoLockHeight + result->tetrimino.getHeight();
-            secondGridCopy.setCells(result->tetrimino);
+            factors.totalLockHeight = firstTetriminoLockHeight + secondResult->tetrimino.getHeight();
+            secondGridCopy.setCells(secondResult->tetrimino);
             factors.totalLinesCleared = firstTetriminoLineClears + gridCopy.getFullRows().size();
             secondGridCopy.clearFullRows();
 
