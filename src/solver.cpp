@@ -208,7 +208,7 @@ void computeEvaluationFactors(GameGrid grid, EvaluationFactors& factors) {
 
 double computeFitness(EvaluationFactors factors) {
     return (
-        factors.totalLinesCleared * -10.0 +
+        factors.totalLinesCleared * 1 +
         factors.totalLockHeight * 12.885008263218383 +
         factors.totalWellCells * 15.842707182438396 + 
         factors.totalColumnHoles * 26.894496507795950 + 
@@ -230,12 +230,11 @@ Moves solve(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) 
             continue;
         }
 
-        EvaluationFactors factors;
-        factors.totalLockHeight = firstResult->tetrimino.getHeight();
+        int firstTetriminoLockHeight = firstResult->tetrimino.getHeight();
 
         GameGrid gridCopy = grid;
         gridCopy.setCells(firstResult->tetrimino);
-        factors.totalLinesCleared = gridCopy.getFullRows().size();
+        int firstTetriminoLineClears = gridCopy.getFullRows().size();
         gridCopy.clearRows(gridCopy.getFullRows());
 
         Graph secondGraph = makeGraph(secondTetrimino, gridCopy);
@@ -246,12 +245,14 @@ Moves solve(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) 
                 continue;
             }
 
-            factors.totalLockHeight += result->tetrimino.getHeight();
-            gridCopy.setCells(result->tetrimino);
-            factors.totalLinesCleared += gridCopy.getFullRows().size();
-            gridCopy.clearRows(gridCopy.getFullRows());
+            EvaluationFactors factors;
+            GameGrid secondGridCopy = gridCopy;
+            factors.totalLockHeight = firstTetriminoLockHeight + result->tetrimino.getHeight();
+            secondGridCopy.setCells(result->tetrimino);
+            factors.totalLinesCleared = firstTetriminoLineClears + gridCopy.getFullRows().size();
+            secondGridCopy.clearRows(gridCopy.getFullRows());
 
-            computeEvaluationFactors(gridCopy, factors);
+            computeEvaluationFactors(secondGridCopy, factors);
             double fitness = computeFitness(factors);
             
             if (bestFitness < 0 or fitness < bestFitness) {
@@ -277,28 +278,29 @@ Tetrimino solveForFinalPos(GameGrid grid, Tetrimino firstTetrimino, Tetrimino se
             continue;
         }
 
-        EvaluationFactors factors;
-        factors.totalLockHeight = firstResult->tetrimino.getHeight();
+        int firstTetriminoLockHeight = firstResult->tetrimino.getHeight();
 
         GameGrid gridCopy = grid;
         gridCopy.setCells(firstResult->tetrimino);
-        factors.totalLinesCleared = gridCopy.getFullRows().size();
+        int firstTetriminoLineClears = gridCopy.getFullRows().size();
         gridCopy.clearRows(gridCopy.getFullRows());
 
         Graph secondGraph = makeGraph(secondTetrimino, gridCopy);
         std::vector<GraphNode*> secondResults = search(secondGraph, secondTetrimino, gridCopy);
 
-        for (GraphNode *result : secondResults) {
-            if (gridCopy.checkCollision(result->tetrimino)) {
+        for (GraphNode *secondResult : secondResults) {
+            if (gridCopy.checkCollision(secondResult->tetrimino)) {
                 continue;
             }
 
-            factors.totalLockHeight += result->tetrimino.getHeight();
-            gridCopy.setCells(result->tetrimino);
-            factors.totalLinesCleared += gridCopy.getFullRows().size();
-            gridCopy.clearRows(gridCopy.getFullRows());
+            EvaluationFactors factors;
+            GameGrid secondGridCopy = gridCopy;
+            factors.totalLockHeight = firstTetriminoLockHeight + secondResult->tetrimino.getHeight();
+            secondGridCopy.setCells(secondResult->tetrimino);
+            factors.totalLinesCleared = firstTetriminoLineClears + secondGridCopy.getFullRows().size();
+            secondGridCopy.clearRows(secondGridCopy.getFullRows());
 
-            computeEvaluationFactors(gridCopy, factors);
+            computeEvaluationFactors(secondGridCopy, factors);
             double fitness = computeFitness(factors);
             
             if (bestFitness < 0 or fitness < bestFitness) {

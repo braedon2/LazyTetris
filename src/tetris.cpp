@@ -172,14 +172,33 @@ void GameGrid::clearRows(std::vector<int> row_indices) {
 }
 
 void GameGrid::print() {
+    std::string reset = "\033[0m";
+    std::string red = "\033[31m";
+    std::string green = "\033[32m";
+    std::string yellow = "\033[33m";
+
     for (const auto& row : this->grid) {
         std::cout << "|";
+
         for (const auto& cell : row) {
+            std::string color = "";
+            if (cell.spriteType == first) {
+                color = red;
+            } else if (cell.spriteType == second) {
+                color = green;
+            } else {
+                color = yellow;
+            }
+
             if (cell.isEmpty) {
                 std::cout << " ";
             } 
             else {
-                std::cout << "*";
+                if (color != "") {
+                    std::cout << color << "*" << reset;
+                } else {
+                    std::cout << "*";
+                }
             }
         }
         std::cout << "|" << std::endl;

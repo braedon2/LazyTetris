@@ -207,7 +207,7 @@ class GameState {
     */
     public:
     Tetrimino currentTetrimino = Tetrimino(T); // replaced with random tetrimino in constructor
-    Tetrimino nextTetrimino = Tetrimino(T); // replacedw tih random tetrimino in constructor
+    Tetrimino nextTetrimino = Tetrimino(T); // replaced wtih random tetrimino in constructor
     bool isCurrentTetriminoPlaced = false;
     std::vector<int> linesToClear;
     int lineClearStep = 0; 

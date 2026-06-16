@@ -127,6 +127,50 @@ TEST(SearchTest, FollowMovesOfVerticalITetrimino) {
     EXPECT_EQ(results.at(1)->tetrimino, tetrimino);
 }
 
+TEST(SearchTest, VisualizeAllTwoTetriminoCombinations) {
+    GameGrid grid;
+    Tetrimino firstTetrimino = Tetrimino(T);
+    firstTetrimino.xDelta = SPAWN_X_DELTA;
+    Tetrimino secondTetrimino = Tetrimino(L);
+    secondTetrimino.xDelta = SPAWN_X_DELTA;
+
+    Graph firstGraph = makeGraph(firstTetrimino, grid);
+    std::vector<GraphNode*> firstResults = search(firstGraph, firstTetrimino, grid);
+
+    for (GraphNode* firstResult : firstResults) {
+        int firstTetriminoLockHeight = firstResult->tetrimino.getHeight();
+
+        GameGrid gridCopy = grid;
+        gridCopy.setCells(firstResult->tetrimino);
+        int firstTetriminoLineClears = gridCopy.getFullRows().size();
+        gridCopy.clearRows(gridCopy.getFullRows());
+
+        Graph secondGraph = makeGraph(secondTetrimino, gridCopy);
+        std::vector<GraphNode*> secondResults = search(secondGraph, secondTetrimino, gridCopy);
+
+        for (GraphNode* secondResult : secondResults) {
+            EvaluationFactors factors;
+
+            GameGrid secondGridCopy = gridCopy;
+            factors.totalLockHeight = firstTetriminoLockHeight + secondResult->tetrimino.getHeight();
+            secondGridCopy.setCells(secondResult->tetrimino);
+            factors.totalLinesCleared = firstTetriminoLineClears + secondGridCopy.getFullRows().size();
+            secondGridCopy.clearRows(secondGridCopy.getFullRows());
+            secondGridCopy.print();
+
+            computeEvaluationFactors(secondGridCopy, factors);
+            double fitness = computeFitness(factors);
+
+            std::cout << "total lines cleared: " << factors.totalLinesCleared << std::endl;
+            std::cout << "total lock height: " << factors.totalLockHeight << std::endl;
+            std::cout << "total well cells: " << factors.totalWellCells << std::endl;
+            std::cout << "total column holes: " << factors.totalColumnHoles << std::endl;
+            std::cout << "total column transisionts: " << factors.totalColumnTransistions << std::endl;
+            std::cout << "total row transistions: " << factors.totalRowTransitions << std::endl << std::endl;
+        }
+    }
+}
+
 TEST(EvaluationTest, AllFactors) {
     GameGrid grid;
     std::vector<std::vector<int>> gridFillData = {
