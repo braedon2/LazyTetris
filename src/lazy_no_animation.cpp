@@ -20,7 +20,7 @@ int main(void) {
     state.playerControlled = false;
     FrameDrawer frameDrawer;
 
-    Tetrimino tetriminoToPlace = solveForFinalPos(state.getGrid(), state.getCurrentTetrimino(), state.getNextTetrimino());
+    Tetrimino tetriminoToPlace = solveForOptimalTetrimino(state.getGrid(), state.getCurrentTetrimino(), state.getNextTetrimino());
 
     // main gameplay loop
     while (!WindowShouldClose() and !state.gameOver) {
@@ -33,7 +33,7 @@ int main(void) {
         }
 
         state.initNewTetrimino();
-        tetriminoToPlace = solveForFinalPos(state.getGrid(), state.getCurrentTetrimino(), state.getNextTetrimino());
+        tetriminoToPlace = solveForOptimalTetrimino(state.getGrid(), state.getCurrentTetrimino(), state.getNextTetrimino());
 
         frameDrawer.drawFrame(state, false);
     }

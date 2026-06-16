@@ -1,6 +1,5 @@
 #include <algorithm>
 #include <queue>
-#include <iostream>
 #include <vector>
 #include "constants.h"
 #include "tetris.h"
@@ -218,11 +217,10 @@ double computeFitness(EvaluationFactors factors) {
 }
 
 
-Moves solve(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) {
+GraphNode* solve(Graph& firstTetriminoGraph, GameGrid& grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) {
     GraphNode *bestResult;
     double bestFitness = -1.0;
-    Graph firstGraph = makeGraph(firstTetrimino, grid);
-    std::vector<GraphNode*> firstResults = search(firstGraph, firstTetrimino, grid);
+    std::vector<GraphNode*> firstResults = search(firstTetriminoGraph, firstTetrimino, grid);
     bestResult = firstResults.at(0); // need a result to return in case all search results cause collisions
 
     for (GraphNode *firstResult : firstResults) {
@@ -262,53 +260,19 @@ Moves solve(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) 
         }
     }
 
+    return bestResult;
+}
+
+
+Moves solveForMovesToOptimalTetrimino(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) {
+    Graph firstGraph = makeGraph(firstTetrimino, grid);
+    GraphNode* bestResult = solve(firstGraph, grid, firstTetrimino, secondTetrimino);
     return movesToReachSearchResult(bestResult);
 }
 
 
-Tetrimino solveForFinalPos(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) {
-    GraphNode *bestResult;
-    double bestFitness = -1.0;
+Tetrimino solveForOptimalTetrimino(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) {
     Graph firstGraph = makeGraph(firstTetrimino, grid);
-    std::vector<GraphNode*> firstResults = search(firstGraph, firstTetrimino, grid);
-    bestResult = firstResults.at(0); // need a result to return in case all search results cause collisions
-
-    for (GraphNode *firstResult : firstResults) {
-        if (grid.checkCollision(firstResult->tetrimino)) {
-            continue;
-        }
-
-        int firstTetriminoLockHeight = firstResult->tetrimino.getHeight();
-
-        GameGrid gridCopy = grid;
-        gridCopy.setCells(firstResult->tetrimino);
-        int firstTetriminoLineClears = gridCopy.getFullRows().size();
-        gridCopy.clearRows(gridCopy.getFullRows());
-
-        Graph secondGraph = makeGraph(secondTetrimino, gridCopy);
-        std::vector<GraphNode*> secondResults = search(secondGraph, secondTetrimino, gridCopy);
-
-        for (GraphNode *secondResult : secondResults) {
-            if (gridCopy.checkCollision(secondResult->tetrimino)) {
-                continue;
-            }
-
-            EvaluationFactors factors;
-            GameGrid secondGridCopy = gridCopy;
-            factors.totalLockHeight = firstTetriminoLockHeight + secondResult->tetrimino.getHeight();
-            secondGridCopy.setCells(secondResult->tetrimino);
-            factors.totalLinesCleared = firstTetriminoLineClears + secondGridCopy.getFullRows().size();
-            secondGridCopy.clearRows(secondGridCopy.getFullRows());
-
-            computeEvaluationFactors(secondGridCopy, factors);
-            double fitness = computeFitness(factors);
-            
-            if (bestFitness < 0 or fitness < bestFitness) {
-                bestFitness = fitness;
-                bestResult = firstResult;
-            }
-        }
-    }
-
+    GraphNode* bestResult = solve(firstGraph, grid, firstTetrimino, secondTetrimino);
     return bestResult->tetrimino;
 }

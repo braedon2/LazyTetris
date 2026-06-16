@@ -22,7 +22,7 @@ int main(void) {
     state.playerControlled = false;
     FrameDrawer frameDrawer;
 
-    Moves moves = solve(state.getGrid(), state.getCurrentTetrimino(), state.getNextTetrimino());
+    Moves moves = solveForMovesToOptimalTetrimino(state.getGrid(), state.getCurrentTetrimino(), state.getNextTetrimino());
     std::vector<Move>::iterator currentMove = moves.begin();
 
     int frameCounter = 0;
@@ -61,7 +61,7 @@ int main(void) {
 
         if (state.isCurrentTetrominoPlaced() and frameCounter >= FRAMES_PER_TETRONIMO_RESET) {
             state.initNewTetrimino();
-            moves = solve(state.getGrid(), state.getCurrentTetrimino(), state.getNextTetrimino());
+            moves = solveForMovesToOptimalTetrimino(state.getGrid(), state.getCurrentTetrimino(), state.getNextTetrimino());
             currentMove = moves.begin();
             frameCounter = 0;
         }
