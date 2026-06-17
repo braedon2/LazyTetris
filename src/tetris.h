@@ -15,9 +15,9 @@ class Position {
 enum Rotation { clockwise, counterClockwise };
 enum Direction { down, right, left };
 
-/// used as a key to map a tetromino shape to data that relates to it
-enum TetriminoShape { I, J, L, O, S, T, Z };
-const int numTetriminoShapes = 6;
+/// used as a key to map a tetromino shape to data that relates to it. N is used as a null shape
+enum TetriminoShape { I, J, L, O, S, T, Z, N };
+const int numTetriminoShapes = 6; // exludes the N shape because it's null and not an actual shape
 
 /// There are three sprite variants for each level
 /// A GridCell instance stores a spriteType instead of the sprite itself.
@@ -165,6 +165,7 @@ class Tetrimino {
     TetriminoShape shape;
 
     public:
+    Tetrimino() : rotationList(nullptr), xDelta(0), yDelta(0), rotationStep(0), shape(N) {};
     Tetrimino(TetriminoShape shape);
     Tetrimino(TetriminoShape shape, int xDelta, int yDelta, int rotationStep);
     std::vector<Position> getPositions();
@@ -218,7 +219,7 @@ class GameState {
     int level = 0;
     bool gameOver = false;
     bool playerControlled = true;
-    int AISpeed = 1;
+    int AISpeed = 5;
 
     public:
     GameState();

@@ -37,26 +37,25 @@ void setNodeNeighbours(GraphNode& node, Graph& graph, GameGrid& grid) {
 
 Graph makeGraph(Tetrimino& tetrimino, GameGrid& grid) {
     Graph graph;
-    for (int i = 0; i < GRID_HEIGHT; i++) {
-        graph.push_back(std::vector<std::vector<GraphNode>>());
-        for (int j = 0; j < GRID_WIDTH; j++) {
-            graph.at(i).push_back(std::vector<GraphNode>());
+    for (int y = 0; y < GRID_HEIGHT; y++) {
+        for (int x = 0; x < GRID_WIDTH; x++) {
             for (int rotation = 0; rotation < tetrimino.rotationList->size(); rotation++) {
-                GraphNode node = {
-                    Tetrimino(tetrimino.shape, j, i, rotation),
-                    false, // visited
-                    nullptr, // prev
-                    std::vector<GraphNode*>() // neighbours
+                graph[y][x][rotation] = { // GraphNode
+                    .tetrimino = Tetrimino(tetrimino.shape, x, y, rotation),
+                    .visited = false,
+                    .prev = nullptr,
+                    .neighbours = std::vector<GraphNode*>()
                 };
-                graph.at(i).at(j).push_back(node);
             }
         }
     }
 
-    for (std::vector<std::vector<GraphNode>>& row : graph) {
-        for (std::vector<GraphNode>& col : row) {
+    for (std::array<std::array<GraphNode, 4>, GRID_WIDTH>& row : graph) {
+        for (std::array<GraphNode, 4>& col : row) {
             for(GraphNode& node : col) {
-                setNodeNeighbours(node, graph, grid);
+                if (node.tetrimino.shape != N) { // tetrimino is not null
+                    setNodeNeighbours(node, graph, grid);
+                }
             }
         }
     }

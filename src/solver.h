@@ -1,8 +1,10 @@
 #ifndef SOLVER_H
 #define SOLVER_H
 
+#include <array>
 #include <variant>
 #include <vector>
+#include "constants.h"
 #include "tetris.h"
 
 struct GraphNode {
@@ -12,7 +14,7 @@ struct GraphNode {
     std::vector<GraphNode*> neighbours;
 };
 
-typedef std::vector<std::vector<std::vector<GraphNode>>> Graph; // first dimension is row second dimension is column
+typedef std::array<std::array<std::array<GraphNode, 4>, GRID_WIDTH>, GRID_HEIGHT> Graph; // first dimension is row second dimension is column third dimension is rotation
 
 struct EvaluationFactors {
     int totalLinesCleared = 0;
