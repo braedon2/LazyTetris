@@ -1,8 +1,10 @@
 #ifndef TETRIS_H
 #define TETRIS_H
 
+#include <array>
 #include <map>
 #include <vector>
+#include "constants.h"
 #include "raylib.h"
 
 class Position {
@@ -149,6 +151,7 @@ class GridCell {
     public:
     SpriteType spriteType;
     bool isEmpty;
+    GridCell() : spriteType(none), isEmpty(true) {};
     GridCell(SpriteType _spriteType, bool _isEmpty): spriteType(_spriteType), isEmpty(_isEmpty) {}
 };
 
@@ -178,10 +181,9 @@ class Tetrimino {
 
 class GameGrid {
     private:
-    std::vector<std::vector<GridCell>> grid; // first dimension is row, second dimension is column
+    std::array<std::array<GridCell, GRID_WIDTH>, GRID_HEIGHT> grid{}; // first dimension is row, second dimension is column
 
     public:
-    GameGrid();
     bool isEmpty(Position p);
     bool isEmpty(int x, int y);
     SpriteType getSpriteType(Position p); 

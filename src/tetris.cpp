@@ -1,3 +1,4 @@
+#include <array>
 #include <cstdlib>
 #include <sstream>
 #include <iomanip>
@@ -88,12 +89,6 @@ bool Tetrimino::operator == (const Tetrimino& tetrimino) const {
  * GameGrid
  **********/
 
-GameGrid::GameGrid() {
-    for (int i = 0; i < GRID_HEIGHT; i++) {
-        grid.push_back(std::vector<GridCell>(GRID_WIDTH, GridCell(none, true)));
-    }
-}
-
 bool GameGrid::isEmpty(Position p) {
     return this->grid.at(p.y).at(p.x).isEmpty;
 }
@@ -161,14 +156,12 @@ std::vector<int> GameGrid::getFullRows() {
 }
 
 void GameGrid::clearRows(std::vector<int> row_indices) {
-    // for each cleared row, delete the row then insert an empty row at the beginning of the list
-    // so all the rows above it appear to shift down one level in the grid
     for (int i : row_indices) {
-        this->grid.erase(this->grid.begin() + i);
-        this->grid.insert(
-            this->grid.begin(), 
-            std::vector<GridCell>(GRID_WIDTH, GridCell(none, true)));
+        for (int r = i - 1; r >= 0; r--) { // shift each row above i down
+            this->grid[r+1] = this->grid[r];
+        }
     }
+    this->grid[0] = std::array<GridCell, GRID_WIDTH>(); // at least one row has been cleared so the first row must contain nothing
 }
 
 void GameGrid::clearFullRows() {
