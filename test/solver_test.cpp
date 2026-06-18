@@ -4,6 +4,34 @@
 #include "tetris.h"
 #include "solver.h"
 
+TEST(NodeNeighbourTest, Iterate) {
+    Tetrimino expectedShapes[] = {T, T, L, I, J};
+    int i = 0;
+
+    GraphNode g1 = {.tetrimino = Tetrimino(T)};
+    GraphNode g2 = {.tetrimino = Tetrimino(L)};
+    GraphNode g3 = {.tetrimino = Tetrimino(I)};
+    GraphNode g4 = {.tetrimino = Tetrimino(J)};
+
+    // node neighbours will be iterated with between 1 and 4 items so test both extremes
+    NodeNeighbours neighbours;
+    neighbours.push_back(&g1);
+
+    for (GraphNode* n : neighbours) {
+        EXPECT_EQ(expectedShapes[i], n->tetrimino.shape);
+        i++;
+    }
+
+    neighbours.push_back(&g2);
+    neighbours.push_back(&g3);
+    neighbours.push_back(&g4);
+
+    for (GraphNode* n : neighbours) {
+        EXPECT_EQ(expectedShapes[i], n->tetrimino.shape);
+        i++;
+    }
+}
+
 TEST(SearchTest, EmptyGridWithOTetrimino) {
     GameGrid grid;
     Tetrimino tetrimino(O);

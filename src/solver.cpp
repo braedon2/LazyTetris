@@ -42,9 +42,6 @@ Graph makeGraph(Tetrimino& tetrimino, GameGrid& grid) {
             for (int rotation = 0; rotation < tetrimino.rotationList->size(); rotation++) {
                 graph[y][x][rotation] = { // GraphNode
                     .tetrimino = Tetrimino(tetrimino.shape, x, y, rotation),
-                    .visited = false,
-                    .prev = nullptr,
-                    .neighbours = std::vector<GraphNode*>()
                 };
             }
         }
