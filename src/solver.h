@@ -47,6 +47,15 @@ struct EvaluationFactors {
     int totalRowTransitions = 0;
 };
 
+struct EvaluationWeights {
+    double totalLinesCleared;
+    double totalLockHeight;
+    double totalWellCells;
+    double totalColumnHoles;
+    double totalColumnTransitions;
+    double totalRowTransitions;
+};
+
 typedef std::array<std::array<std::array<GraphNode, 4>, GRID_WIDTH>, GRID_HEIGHT> Graph; // first dimension is row second dimension is column third dimension is rotation
 typedef std::variant<Direction, Rotation> Move;
 typedef std::vector<Move> Moves;
@@ -57,10 +66,10 @@ std::vector<GraphNode*> search(Graph &graph, Tetrimino& tetrimino, GameGrid& gri
 Moves movesToReachSearchResult(GraphNode* searchResult);
 
 void computeEvaluationFactors(GameGrid grid, EvaluationFactors& factors);
-double computeFitness(EvaluationFactors factors);
+double computeFitness(EvaluationFactors factors, EvaluationWeights weights);
 
-GraphNode* solve(Graph& firstTetriminoGraph, GameGrid& grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino);
-Moves solveForMovesToOptimalTetrimino(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino);
-Tetrimino solveForOptimalTetrimino(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino);
+GraphNode* solve(Graph& firstTetriminoGraph, GameGrid& grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino, EvaluationWeights weights);
+Moves solveForMovesToOptimalTetrimino(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino, EvaluationWeights weights);
+Tetrimino solveForOptimalTetrimino(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino, EvaluationWeights weights);
 
 #endif

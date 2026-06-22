@@ -201,19 +201,19 @@ void computeEvaluationFactors(GameGrid grid, EvaluationFactors& factors) {
 }
 
 
-double computeFitness(EvaluationFactors factors) {
+double computeFitness(EvaluationFactors factors, EvaluationWeights weights) {
     return (
-        factors.totalLinesCleared * 1 +
-        factors.totalLockHeight * 12.885008263218383 +
-        factors.totalWellCells * 15.842707182438396 + 
-        factors.totalColumnHoles * 26.894496507795950 + 
-        factors.totalColumnTransistions * 27.616914062397015 + 
-        factors.totalRowTransitions * 30.185110719279040
+        factors.totalLinesCleared * weights.totalLinesCleared +
+        factors.totalLockHeight * weights.totalLockHeight +
+        factors.totalWellCells * weights.totalWellCells + 
+        factors.totalColumnHoles * weights.totalColumnHoles + 
+        factors.totalColumnTransistions * weights.totalColumnTransitions + 
+        factors.totalRowTransitions * weights.totalRowTransitions
     );
 }
 
 
-GraphNode* solve(Graph& firstTetriminoGraph, GameGrid& grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) {
+GraphNode* solve(Graph& firstTetriminoGraph, GameGrid& grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino, EvaluationWeights weights) {
     GraphNode* bestResult;
     double bestFitness = -1.0;
     std::vector<GraphNode*> firstResults = search(firstTetriminoGraph, firstTetrimino, grid);
@@ -247,7 +247,7 @@ GraphNode* solve(Graph& firstTetriminoGraph, GameGrid& grid, Tetrimino firstTetr
             secondGridCopy.clearFullRows();
 
             computeEvaluationFactors(secondGridCopy, factors);
-            double fitness = computeFitness(factors);
+            double fitness = computeFitness(factors, weights);
             
             if (bestFitness < 0 or fitness < bestFitness) {
                 bestFitness = fitness;
@@ -260,15 +260,15 @@ GraphNode* solve(Graph& firstTetriminoGraph, GameGrid& grid, Tetrimino firstTetr
 }
 
 
-Moves solveForMovesToOptimalTetrimino(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) {
+Moves solveForMovesToOptimalTetrimino(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino, EvaluationWeights weights) {
     Graph firstGraph = makeGraph(firstTetrimino, grid);
-    GraphNode* bestResult = solve(firstGraph, grid, firstTetrimino, secondTetrimino);
+    GraphNode* bestResult = solve(firstGraph, grid, firstTetrimino, secondTetrimino, weights);
     return movesToReachSearchResult(bestResult);
 }
 
 
-Tetrimino solveForOptimalTetrimino(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) {
+Tetrimino solveForOptimalTetrimino(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino, EvaluationWeights weights) {
     Graph firstGraph = makeGraph(firstTetrimino, grid);
-    GraphNode* bestResult = solve(firstGraph, grid, firstTetrimino, secondTetrimino);
+    GraphNode* bestResult = solve(firstGraph, grid, firstTetrimino, secondTetrimino, weights);
     return bestResult->tetrimino;
 }

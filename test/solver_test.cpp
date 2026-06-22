@@ -187,7 +187,6 @@ TEST(SearchTest, VisualizeAllTwoTetriminoCombinations) {
             secondGridCopy.print();
 
             computeEvaluationFactors(secondGridCopy, factors);
-            double fitness = computeFitness(factors);
 
             std::cout << "total lines cleared: " << factors.totalLinesCleared << std::endl;
             std::cout << "total lock height: " << factors.totalLockHeight << std::endl;

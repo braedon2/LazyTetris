@@ -22,7 +22,16 @@ int main(void) {
     state.playerControlled = false;
     FrameDrawer frameDrawer;
 
-    Moves moves = solveForMovesToOptimalTetrimino(state.getGrid(), state.getCurrentTetrimino(), state.getNextTetrimino());
+    EvaluationWeights weights = {
+        .totalLinesCleared = 1.0,
+        .totalLockHeight = 12.885008263218383,
+        .totalWellCells = 15.842707182438396,
+        .totalColumnHoles = 26.894496507795950,
+        .totalColumnTransitions = 27.616914062397015,
+        .totalRowTransitions = 30.185110719279040
+    };
+
+    Moves moves = solveForMovesToOptimalTetrimino(state.getGrid(), state.getCurrentTetrimino(), state.getNextTetrimino(), weights);
     std::vector<Move>::iterator currentMove = moves.begin();
 
     int frameCounter = 0;
@@ -61,7 +70,7 @@ int main(void) {
 
         if (state.isCurrentTetrominoPlaced() and frameCounter >= FRAMES_PER_TETRONIMO_RESET) {
             state.initNewTetrimino();
-            moves = solveForMovesToOptimalTetrimino(state.getGrid(), state.getCurrentTetrimino(), state.getNextTetrimino());
+            moves = solveForMovesToOptimalTetrimino(state.getGrid(), state.getCurrentTetrimino(), state.getNextTetrimino(), weights);
             currentMove = moves.begin();
             frameCounter = 0;
         }

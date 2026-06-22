@@ -20,7 +20,16 @@ int main(void) {
     state.playerControlled = false;
     FrameDrawer frameDrawer;
 
-    Tetrimino tetriminoToPlace = solveForOptimalTetrimino(state.getGrid(), state.getCurrentTetrimino(), state.getNextTetrimino());
+    EvaluationWeights weights = {
+        .totalLinesCleared = 1.0,
+        .totalLockHeight = 12.885008263218383,
+        .totalWellCells = 15.842707182438396,
+        .totalColumnHoles = 26.894496507795950,
+        .totalColumnTransitions = 27.616914062397015,
+        .totalRowTransitions = 30.185110719279040
+    };
+
+    Tetrimino tetriminoToPlace = solveForOptimalTetrimino(state.getGrid(), state.getCurrentTetrimino(), state.getNextTetrimino(), weights);
 
     // main gameplay loop
     while (!WindowShouldClose() and !state.gameOver) {
@@ -33,7 +42,7 @@ int main(void) {
         }
 
         state.initNewTetrimino();
-        tetriminoToPlace = solveForOptimalTetrimino(state.getGrid(), state.getCurrentTetrimino(), state.getNextTetrimino());
+        tetriminoToPlace = solveForOptimalTetrimino(state.getGrid(), state.getCurrentTetrimino(), state.getNextTetrimino(), weights);
 
         frameDrawer.drawFrame(state, false);
     }

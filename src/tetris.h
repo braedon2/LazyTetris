@@ -221,7 +221,7 @@ class GameState {
     int level = 0;
     bool gameOver = false;
     bool playerControlled = true;
-    int AISpeed = 5;
+    int AISpeed = 1;
 
     public:
     GameState();
