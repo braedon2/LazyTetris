@@ -67,12 +67,11 @@ add_executable(
   src/solver.cpp
 )
 
-# Link raylib to main
 target_link_libraries(
     lazy_no_animation  
     raylib
 )
-# Make main find the <raylib.h> header (and others)
+
 target_include_directories(lazy_no_animation  PUBLIC "${raylib_SOURCE_DIR}/src")
 
 add_executable(
@@ -82,13 +81,23 @@ add_executable(
   src/solver.cpp
 )
 
-# Link raylib to main
 target_link_libraries(
     lazy 
     raylib
 )
-# Make main find the <raylib.h> header (and others)
+
 target_include_directories(lazy PUBLIC "${raylib_SOURCE_DIR}/src")
+
+add_executable(
+  particle_swarm
+  src/particle_swarm.cpp
+  src/particle_swarm.h
+)
+
+target_link_libraries(
+  particle_swarm
+  raylib
+)
 
 if (EMSCRIPTEN)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lidbfs.js -s USE_GLFW=3 --shell-file ${CMAKE_CURRENT_LIST_DIR}/web/minshell.html --preload-file ${CMAKE_CURRENT_LIST_DIR}/resources/@resources/ -s GL_ENABLE_GET_PROC_ADDRESS=1")
