@@ -5,53 +5,54 @@
 #include "tetris.h"
 #include "solver.h"
 
-void setNodeNeighbours(GraphNode& node, Graph& graph, GameGrid& grid) {
+void setNodeNeighbours(GraphNode& node, Graph* graph, GameGrid& grid) {
     // hot path optimization: this function gets called a lot so instead of using tetrimino.move which makes a copy,
     // a copy of the node tetrimino is made and its state is modified directly
     Tetrimino tetriminoCopy(node.tetrimino.shape, node.tetrimino.xDelta, node.tetrimino.yDelta, node.tetrimino.rotationStep);
 
     tetriminoCopy.xDelta -= 1; // move left
     if (not grid.checkCollision(tetriminoCopy)) {
-        node.neighbours.push_back(&graph.at(tetriminoCopy.yDelta).at(tetriminoCopy.xDelta).at(tetriminoCopy.rotationStep));
+        node.neighbours.push_back(&(*graph)[tetriminoCopy.yDelta][tetriminoCopy.xDelta][tetriminoCopy.rotationStep]);
     }
 
     tetriminoCopy.xDelta += 2; // move right
     if (not grid.checkCollision(tetriminoCopy)) {
-        node.neighbours.push_back(&graph.at(tetriminoCopy.yDelta).at(tetriminoCopy.xDelta).at(tetriminoCopy.rotationStep));
+        node.neighbours.push_back(&(*graph)[tetriminoCopy.yDelta][tetriminoCopy.xDelta][tetriminoCopy.rotationStep]);
     }
 
     tetriminoCopy.xDelta -= 1; // undo move right
     int oldRotationStep = tetriminoCopy.rotationStep;
     tetriminoCopy.rotationStep = (tetriminoCopy.rotationStep + 1) % tetriminoCopy.rotationList->size();
     if (not grid.checkCollision(tetriminoCopy)) {
-        node.neighbours.push_back(&graph.at(tetriminoCopy.yDelta).at(tetriminoCopy.xDelta).at(tetriminoCopy.rotationStep));
+        node.neighbours.push_back(&(*graph)[tetriminoCopy.yDelta][tetriminoCopy.xDelta][tetriminoCopy.rotationStep]);
     }
     tetriminoCopy.rotationStep = oldRotationStep; // restore rotation step
 
     tetriminoCopy.yDelta += 1; // move down
     if (not grid.checkCollision(tetriminoCopy)) {
-        node.neighbours.push_back(&graph.at(tetriminoCopy.yDelta).at(tetriminoCopy.xDelta).at(tetriminoCopy.rotationStep));
+        node.neighbours.push_back(&(*graph)[tetriminoCopy.yDelta][tetriminoCopy.xDelta][tetriminoCopy.rotationStep]);
     }
 }
 
 
-Graph makeGraph(Tetrimino& tetrimino, GameGrid& grid) {
-    Graph graph;
+std::unique_ptr<Graph> makeGraph(Tetrimino& tetrimino, GameGrid& grid) {
+    auto graph = std::make_unique<Graph>();
+
     for (int y = 0; y < GRID_HEIGHT; y++) {
         for (int x = 0; x < GRID_WIDTH; x++) {
             for (int rotation = 0; rotation < tetrimino.rotationList->size(); rotation++) {
-                graph[y][x][rotation] = { // GraphNode
+                (*graph)[y][x][rotation] = { // GraphNode
                     .tetrimino = Tetrimino(tetrimino.shape, x, y, rotation),
                 };
             }
         }
     }
 
-    for (std::array<std::array<GraphNode, 4>, GRID_WIDTH>& row : graph) {
+    for (std::array<std::array<GraphNode, 4>, GRID_WIDTH>& row : *graph) {
         for (std::array<GraphNode, 4>& col : row) {
             for(GraphNode& node : col) {
                 if (node.tetrimino.shape != N) { // tetrimino is not null
-                    setNodeNeighbours(node, graph, grid);
+                    setNodeNeighbours(node, graph.get(), grid);
                 }
             }
         }
@@ -60,11 +61,11 @@ Graph makeGraph(Tetrimino& tetrimino, GameGrid& grid) {
 }
 
 
-std::vector<GraphNode*> search(Graph& graph, Tetrimino& tetrimino, GameGrid& grid) {
+std::vector<GraphNode*> search(Graph* graph, Tetrimino& tetrimino, GameGrid& grid) {
     std::queue<GraphNode*> queue;
     std::vector<GraphNode*> results;
 
-    GraphNode& root = graph.at(tetrimino.yDelta).at(tetrimino.xDelta).at(tetrimino.rotationStep);
+    GraphNode& root = (*graph)[tetrimino.yDelta][tetrimino.xDelta][tetrimino.rotationStep];
     root.visited = true;  
     queue.push(&root);
 
@@ -213,7 +214,7 @@ double computeFitness(EvaluationFactors factors, EvaluationWeights weights) {
 }
 
 
-GraphNode* solve(Graph& firstTetriminoGraph, GameGrid& grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino, EvaluationWeights weights) {
+GraphNode* solve(Graph* firstTetriminoGraph, GameGrid& grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino, EvaluationWeights weights) {
     GraphNode* bestResult;
     double bestFitness = -1.0;
     std::vector<GraphNode*> firstResults = search(firstTetriminoGraph, firstTetrimino, grid);
@@ -231,8 +232,8 @@ GraphNode* solve(Graph& firstTetriminoGraph, GameGrid& grid, Tetrimino firstTetr
         int firstTetriminoLineClears = gridCopy.getFullRows().size();
         gridCopy.clearFullRows();
 
-        Graph secondGraph = makeGraph(secondTetrimino, gridCopy);
-        std::vector<GraphNode*> secondResults = search(secondGraph, secondTetrimino, gridCopy);
+        auto secondGraph = makeGraph(secondTetrimino, gridCopy);
+        std::vector<GraphNode*> secondResults = search(secondGraph.get(), secondTetrimino, gridCopy);
 
         for (GraphNode* secondResult : secondResults) {
             if (gridCopy.checkCollision(secondResult->tetrimino)) {
@@ -261,14 +262,14 @@ GraphNode* solve(Graph& firstTetriminoGraph, GameGrid& grid, Tetrimino firstTetr
 
 
 Moves solveForMovesToOptimalTetrimino(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino, EvaluationWeights weights) {
-    Graph firstGraph = makeGraph(firstTetrimino, grid);
-    GraphNode* bestResult = solve(firstGraph, grid, firstTetrimino, secondTetrimino, weights);
+    auto firstGraph = makeGraph(firstTetrimino, grid);
+    GraphNode* bestResult = solve(firstGraph.get(), grid, firstTetrimino, secondTetrimino, weights);
     return movesToReachSearchResult(bestResult);
 }
 
 
 Tetrimino solveForOptimalTetrimino(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino, EvaluationWeights weights) {
-    Graph firstGraph = makeGraph(firstTetrimino, grid);
-    GraphNode* bestResult = solve(firstGraph, grid, firstTetrimino, secondTetrimino, weights);
+    auto firstGraph = makeGraph(firstTetrimino, grid);
+    GraphNode* bestResult = solve(firstGraph.get(), grid, firstTetrimino, secondTetrimino, weights);
     return bestResult->tetrimino;
 }

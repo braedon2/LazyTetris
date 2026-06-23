@@ -36,9 +36,9 @@ TEST(SearchTest, EmptyGridWithOTetrimino) {
     GameGrid grid;
     Tetrimino tetrimino(O);
     tetrimino.xDelta = SPAWN_X_DELTA;
-    Graph graph = makeGraph(tetrimino, grid);
+    auto graph = makeGraph(tetrimino, grid);
 
-    std::vector<GraphNode*> results = search(graph, tetrimino, grid);
+    std::vector<GraphNode*> results = search(graph.get(), tetrimino, grid);
 
     std::cout << "Initial grid:" << std::endl;
     grid.print();
@@ -66,9 +66,9 @@ TEST(SearchTest, EmptyGridWithITetrimino) {
     GameGrid grid;
     Tetrimino tetrimino(I);
     tetrimino.xDelta = SPAWN_X_DELTA;
-    Graph graph = makeGraph(tetrimino, grid);
+    auto graph = makeGraph(tetrimino, grid);
 
-    std::vector<GraphNode*> results = search(graph, tetrimino, grid);
+    std::vector<GraphNode*> results = search(graph.get(), tetrimino, grid);
 
     std::cout << "Initial grid:" << std::endl;
     grid.print();
@@ -103,9 +103,9 @@ TEST(SearchTest, NonEmptyGridSlideIntoPlace) {
     grid.setCell(Position(2, 18), first);
     Tetrimino tetrimino(I);
     tetrimino.xDelta = SPAWN_X_DELTA;
-    Graph graph = makeGraph(tetrimino, grid);
+    auto graph = makeGraph(tetrimino, grid);
 
-    std::vector<GraphNode*> results = search(graph, tetrimino, grid);
+    std::vector<GraphNode*> results = search(graph.get(), tetrimino, grid);
 
     std::cout << "Initial grid:" << std::endl;
     grid.print();
@@ -130,9 +130,9 @@ TEST(SearchTest, FollowMovesOfVerticalITetrimino) {
     GameGrid grid;
     Tetrimino tetrimino(I);
     tetrimino.xDelta = SPAWN_X_DELTA;
-    Graph graph = makeGraph(tetrimino, grid);
+    auto graph = makeGraph(tetrimino, grid);
 
-    std::vector<GraphNode*> results = search(graph, tetrimino, grid);
+    std::vector<GraphNode*> results = search(graph.get(), tetrimino, grid);
     EXPECT_EQ(results.at(1)->tetrimino.rotationStep, 0);
 
     Moves moves = movesToReachSearchResult(results.at(1));
@@ -162,8 +162,8 @@ TEST(SearchTest, VisualizeAllTwoTetriminoCombinations) {
     Tetrimino secondTetrimino = Tetrimino(L);
     secondTetrimino.xDelta = SPAWN_X_DELTA;
 
-    Graph firstGraph = makeGraph(firstTetrimino, grid);
-    std::vector<GraphNode*> firstResults = search(firstGraph, firstTetrimino, grid);
+    auto firstGraph = makeGraph(firstTetrimino, grid);
+    std::vector<GraphNode*> firstResults = search(firstGraph.get(), firstTetrimino, grid);
 
     for (GraphNode* firstResult : firstResults) {
         int firstTetriminoLockHeight = firstResult->tetrimino.getHeight();
@@ -173,8 +173,8 @@ TEST(SearchTest, VisualizeAllTwoTetriminoCombinations) {
         int firstTetriminoLineClears = gridCopy.getFullRows().size();
         gridCopy.clearFullRows();
 
-        Graph secondGraph = makeGraph(secondTetrimino, gridCopy);
-        std::vector<GraphNode*> secondResults = search(secondGraph, secondTetrimino, gridCopy);
+        auto secondGraph = makeGraph(secondTetrimino, gridCopy);
+        std::vector<GraphNode*> secondResults = search(secondGraph.get(), secondTetrimino, gridCopy);
 
         for (GraphNode* secondResult : secondResults) {
             EvaluationFactors factors;
