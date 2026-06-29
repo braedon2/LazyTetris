@@ -213,51 +213,27 @@ double computeFitness(EvaluationFactors factors, EvaluationWeights weights) {
     );
 }
 
-
 GraphNode* solve(Graph* firstTetriminoGraph, GameGrid& grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino, EvaluationWeights weights) {
-    GraphNode* bestResult;
+    GraphNode* bestResult = nullptr;
     double bestFitness = -1.0;
-    std::vector<GraphNode*> firstResults = search(firstTetriminoGraph, firstTetrimino, grid);
-    bestResult = firstResults.at(0); // need a result to return in case all search results cause collisions
 
-    for (GraphNode* firstResult : firstResults) {
-        if (grid.checkCollision(firstResult->tetrimino)) {
-            continue;
+    auto analyze = [&firstTetriminoGraph, &bestResult, &bestFitness, &weights](GameGrid& grid, int totalLockHeight, int linesCleared, GraphNode* tetriminoPlacement) {
+        EvaluationFactors factors;
+        computeEvaluationFactors(grid, factors);
+        factors.totalLinesCleared = linesCleared;
+        factors.totalLockHeight = totalLockHeight;
+
+        double fitness = computeFitness(factors, weights);
+
+        if (bestFitness < 0 or fitness < bestFitness) {
+            bestFitness = fitness;
+            bestResult = tetriminoPlacement;
         }
+    };
 
-        int firstTetriminoLockHeight = firstResult->tetrimino.getHeight();
+    GraphNode* defaultResult = analyzeAllCombinations(analyze, firstTetriminoGraph, grid, firstTetrimino, secondTetrimino);
 
-        GameGrid gridCopy = grid;
-        gridCopy.setCells(firstResult->tetrimino);
-        int firstTetriminoLineClears = gridCopy.getFullRows().size();
-        gridCopy.clearFullRows();
-
-        auto secondGraph = makeGraph(secondTetrimino, gridCopy);
-        std::vector<GraphNode*> secondResults = search(secondGraph.get(), secondTetrimino, gridCopy);
-
-        for (GraphNode* secondResult : secondResults) {
-            if (gridCopy.checkCollision(secondResult->tetrimino)) {
-                continue;
-            }
-
-            EvaluationFactors factors;
-            GameGrid secondGridCopy = gridCopy;
-            factors.totalLockHeight = firstTetriminoLockHeight + secondResult->tetrimino.getHeight();
-            secondGridCopy.setCells(secondResult->tetrimino);
-            factors.totalLinesCleared = firstTetriminoLineClears + gridCopy.getFullRows().size();
-            secondGridCopy.clearFullRows();
-
-            computeEvaluationFactors(secondGridCopy, factors);
-            double fitness = computeFitness(factors, weights);
-            
-            if (bestFitness < 0 or fitness < bestFitness) {
-                bestFitness = fitness;
-                bestResult = firstResult;
-            }
-        }
-    }
-
-    return bestResult;
+    return bestResult ? bestResult : defaultResult;
 }
 
 

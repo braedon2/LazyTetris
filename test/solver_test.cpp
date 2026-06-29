@@ -4,7 +4,7 @@
 #include "tetris.h"
 #include "solver.h"
 
-TEST(NodeNeighbourTest, Iterate) {
+TEST(SolverTest, IterateNodeNeighbours) {
     Tetrimino expectedShapes[] = {T, T, L, I, J};
     int i = 0;
 
@@ -32,7 +32,7 @@ TEST(NodeNeighbourTest, Iterate) {
     }
 }
 
-TEST(SearchTest, EmptyGridWithOTetrimino) {
+TEST(SolverTest, SearchEmptyGridWithOTetrimino) {
     GameGrid grid;
     Tetrimino tetrimino(O);
     tetrimino.xDelta = SPAWN_X_DELTA;
@@ -62,7 +62,7 @@ TEST(SearchTest, EmptyGridWithOTetrimino) {
     EXPECT_EQ(node->tetrimino.xDelta, 5);
 }
 
-TEST(SearchTest, EmptyGridWithITetrimino) {
+TEST(SolverTest, SearchEmptyGridWithITetrimino) {
     GameGrid grid;
     Tetrimino tetrimino(I);
     tetrimino.xDelta = SPAWN_X_DELTA;
@@ -95,7 +95,7 @@ TEST(SearchTest, EmptyGridWithITetrimino) {
     EXPECT_EQ(results.size(), 17);
 }
 
-TEST(SearchTest, NonEmptyGridSlideIntoPlace) {
+TEST(SolverTest, SearchNonEmptyGridSlideIntoPlace) {
     GameGrid grid;
     grid.setCell(Position(0, 19), first); // set S shape in botton left
     grid.setCell(Position(1, 19), first);
@@ -126,7 +126,7 @@ TEST(SearchTest, NonEmptyGridSlideIntoPlace) {
     EXPECT_EQ(found, true);
 }
 
-TEST(SearchTest, FollowMovesOfVerticalITetrimino) {
+TEST(SolverTest, FollowMovesOfVerticalITetrimino) {
     GameGrid grid;
     Tetrimino tetrimino(I);
     tetrimino.xDelta = SPAWN_X_DELTA;
@@ -155,7 +155,7 @@ TEST(SearchTest, FollowMovesOfVerticalITetrimino) {
     EXPECT_EQ(results.at(1)->tetrimino, tetrimino);
 }
 
-TEST(SearchTest, VisualizeAllTwoTetriminoCombinations) {
+TEST(SolverTest, AnalyzeAllCombinations) {
     GameGrid grid;
     Tetrimino firstTetrimino = Tetrimino(T);
     firstTetrimino.xDelta = SPAWN_X_DELTA;
@@ -163,42 +163,27 @@ TEST(SearchTest, VisualizeAllTwoTetriminoCombinations) {
     secondTetrimino.xDelta = SPAWN_X_DELTA;
 
     auto firstGraph = makeGraph(firstTetrimino, grid);
-    std::vector<GraphNode*> firstResults = search(firstGraph.get(), firstTetrimino, grid);
 
-    for (GraphNode* firstResult : firstResults) {
-        int firstTetriminoLockHeight = firstResult->tetrimino.getHeight();
+    auto analyze = [](GameGrid& grid, int totalLockHeight, int linesCleared, GraphNode* result) {
+        EvaluationFactors factors;
+        computeEvaluationFactors(grid, factors);
+        factors.totalLinesCleared = linesCleared;
+        factors.totalLockHeight = totalLockHeight;
 
-        GameGrid gridCopy = grid;
-        gridCopy.setCells(firstResult->tetrimino);
-        int firstTetriminoLineClears = gridCopy.getFullRows().size();
-        gridCopy.clearFullRows();
+        grid.print();
+        std::cout << "total lines cleared: " << factors.totalLinesCleared << std::endl;
+        std::cout << "total lock height: " << factors.totalLockHeight << std::endl;
+        std::cout << "total well cells: " << factors.totalWellCells << std::endl;
+        std::cout << "total column holes: " << factors.totalColumnHoles << std::endl;
+        std::cout << "total column transisionts: " << factors.totalColumnTransistions << std::endl;
+        std::cout << "total row transistions: " << factors.totalRowTransitions << std::endl << std::endl;
+        std::cout << "x: " << result->tetrimino.xDelta << std::endl;
+    };
 
-        auto secondGraph = makeGraph(secondTetrimino, gridCopy);
-        std::vector<GraphNode*> secondResults = search(secondGraph.get(), secondTetrimino, gridCopy);
-
-        for (GraphNode* secondResult : secondResults) {
-            EvaluationFactors factors;
-
-            GameGrid secondGridCopy = gridCopy;
-            factors.totalLockHeight = firstTetriminoLockHeight + secondResult->tetrimino.getHeight();
-            secondGridCopy.setCells(secondResult->tetrimino);
-            factors.totalLinesCleared = firstTetriminoLineClears + secondGridCopy.getFullRows().size();
-            secondGridCopy.clearFullRows();
-            secondGridCopy.print();
-
-            computeEvaluationFactors(secondGridCopy, factors);
-
-            std::cout << "total lines cleared: " << factors.totalLinesCleared << std::endl;
-            std::cout << "total lock height: " << factors.totalLockHeight << std::endl;
-            std::cout << "total well cells: " << factors.totalWellCells << std::endl;
-            std::cout << "total column holes: " << factors.totalColumnHoles << std::endl;
-            std::cout << "total column transisionts: " << factors.totalColumnTransistions << std::endl;
-            std::cout << "total row transistions: " << factors.totalRowTransitions << std::endl << std::endl;
-        }
-    }
+    analyzeAllCombinations(analyze, firstGraph.get(), grid, firstTetrimino, secondTetrimino);
 }
 
-TEST(EvaluationTest, AllFactors) {
+TEST(SolverTest, EvaluateAllFactors) {
     GameGrid grid;
     std::vector<std::vector<int>> gridFillData = {
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // starting at row 15 (0 indexed)
@@ -227,7 +212,7 @@ TEST(EvaluationTest, AllFactors) {
     EXPECT_EQ(factors.totalRowTransitions, 24);
 }
 
-TEST(EvaluationTest, EmptyColumnHasNoTransitions) {
+TEST(SolverTest, EmptyColumnHasNoTransitions) {
     GameGrid grid;
     std::vector<std::vector<int>> gridFillData = {
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // starting at row 15 (0 indexed)

@@ -302,7 +302,7 @@ void GameState::clearFullLines() {
         this->level++;
     }
 
-    this->linesCleared += this->linesToClear.size();
+    this->linesCleared += static_cast<int>(this->linesToClear.size());
     this->grid.clearRows(this->linesToClear);
     this->lineClearStep = 0;
     this->linesToClear.clear();
@@ -366,8 +366,8 @@ void FrameDrawer::drawCurrentTetrimino(GameState& state) {
         SpriteType spriteType = tetrimino.getSpriteType();
         Texture2D sprite = this->sprites.getSprite(spriteType, state.level);
         for (auto gridPos : tetrimino.getPositions()) {
-            float x = (gridPos.x * BLOCK_SIZE) + (gridPos.x * GAP_SIZE) + GAP_SIZE;
-            float y = (BLOCK_SIZE * gridPos.y) + (gridPos.y * GAP_SIZE) + GAP_SIZE;
+            float x = static_cast<float>((gridPos.x * BLOCK_SIZE) + (gridPos.x * GAP_SIZE) + GAP_SIZE);
+            float y = static_cast<float>((BLOCK_SIZE * gridPos.y) + (gridPos.y * GAP_SIZE) + GAP_SIZE);
             DrawTexturePro(
                 sprite,
                 { 0.0f, 0.0f, (float)sprite.width, (float)sprite.height },
@@ -389,8 +389,8 @@ void FrameDrawer::drawGridCells(GameState& state) {
             if (!grid.isEmpty(gridPos)) {
                 Texture2D sprite = this->sprites.getSprite(
                     grid.getSpriteType(gridPos), state.level);
-                float x = (gridPos.x * BLOCK_SIZE) + (gridPos.x * GAP_SIZE) + GAP_SIZE;
-                float y = (BLOCK_SIZE * gridPos.y) + (gridPos.y * GAP_SIZE) + GAP_SIZE;
+                float x = static_cast<float>((gridPos.x * BLOCK_SIZE) + (gridPos.x * GAP_SIZE) + GAP_SIZE);
+                float y = static_cast<float>((BLOCK_SIZE * gridPos.y) + (gridPos.y * GAP_SIZE) + GAP_SIZE);
 
                 DrawTexturePro(
                     sprite,
@@ -434,8 +434,8 @@ void FrameDrawer::drawSideBar(GameState& state) {
     auto positions = rotationListMap.at(tetrimino.shape)[0];
     int xAdjust = this->getHorizontalOffset(tetrimino);
     for (auto pos : positions) {
-        float x = GRID_FRAME_WIDTH + 10 + ((pos.x + xAdjust) * BLOCK_SIZE) + ((pos.x + xAdjust) * GAP_SIZE);
-        float y = yStart + 20 + (BLOCK_SIZE * pos.y) + (pos.y * GAP_SIZE);
+        float x = static_cast<float>(GRID_FRAME_WIDTH + 10 + ((pos.x + xAdjust) * BLOCK_SIZE) + ((pos.x + xAdjust) * GAP_SIZE));
+        float y = static_cast<float>(yStart + 20 + (BLOCK_SIZE * pos.y) + (pos.y * GAP_SIZE));
         DrawTexturePro(
             sprite,
             { 0.0f, 0.0f, (float)sprite.width, (float)sprite.height },

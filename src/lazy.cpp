@@ -13,7 +13,7 @@
 
 int main(void) { 
     // third party setup
-    srand(time(0));
+    srand(static_cast<unsigned int>(time(0)));
     InitWindow(GRID_FRAME_WIDTH + 75, GRID_FRAME_HEIGHT, "Tetris");
     SetTargetFPS(60); // my 2014 macbook gets too warm at 60 fps
     

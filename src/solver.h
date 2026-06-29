@@ -3,6 +3,7 @@
 
 #include <array>
 #include <memory>
+#include <utility>
 #include <variant>
 #include <vector>
 #include "constants.h"
@@ -72,7 +73,6 @@ void setNodeNeighbours(GraphNode& node, Graph* graph, GameGrid& grid);
 std::unique_ptr<Graph> makeGraph(Tetrimino& tetrimino, GameGrid& grid);
 std::vector<GraphNode*> search(Graph* graph, Tetrimino& tetrimino, GameGrid& grid);
 Moves movesToReachSearchResult(GraphNode* searchResult);
-
 void computeEvaluationFactors(GameGrid grid, EvaluationFactors& factors);
 double computeFitness(EvaluationFactors factors, EvaluationWeights weights);
 
@@ -85,5 +85,39 @@ GraphNode* solve(
 
 Moves solveForMovesToOptimalTetrimino(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino, EvaluationWeights weights);
 Tetrimino solveForOptimalTetrimino(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino, EvaluationWeights weights);
+
+template <typename Func>
+GraphNode* analyzeAllCombinations(Func analyze, Graph* firstTetriminoGraph, GameGrid& grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) {
+    std::vector<GraphNode*> firstResults = search(firstTetriminoGraph, firstTetrimino, grid);
+
+    for (GraphNode* firstResult : firstResults) {
+        if (grid.checkCollision(firstResult->tetrimino)) {
+            continue;
+        }
+
+        GameGrid gridCopy = grid;
+        gridCopy.setCells(firstResult->tetrimino);
+        int linesCleared = static_cast<int>(gridCopy.getFullRows().size());
+        gridCopy.clearFullRows();
+
+        auto secondGraph = makeGraph(secondTetrimino, gridCopy);
+        std::vector<GraphNode*> secondResults = search(secondGraph.get(), secondTetrimino, gridCopy);
+
+        for (GraphNode* secondResult : secondResults) {
+            if (gridCopy.checkCollision(secondResult->tetrimino)) {
+                continue;
+            }
+
+            GameGrid secondGridCopy = gridCopy;
+            secondGridCopy.setCells(secondResult->tetrimino);
+            linesCleared += static_cast<int>(gridCopy.getFullRows().size());
+            secondGridCopy.clearFullRows();
+
+            analyze(secondGridCopy, firstTetrimino.getHeight() + secondTetrimino.getHeight(), linesCleared, firstResult);
+        }
+    }
+
+    return firstResults.at(0); // need a default result in case everything causes collisions with the grid
+}
 
 #endif
