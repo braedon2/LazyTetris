@@ -13,7 +13,6 @@
 
 int main(void) { 
     // third party setup
-    srand(static_cast<unsigned int>(time(0)));
     InitWindow(GRID_FRAME_WIDTH + 75, GRID_FRAME_HEIGHT, "Tetris");
     SetTargetFPS(60); // my 2014 macbook gets too warm at 60 fps
     
@@ -28,7 +27,8 @@ int main(void) {
         .totalWellCells = 15.842707182438396,
         .totalColumnHoles = 26.894496507795950,
         .totalColumnTransitions = 27.616914062397015,
-        .totalRowTransitions = 30.185110719279040
+        .totalRowTransitions = 30.185110719279040,
+        .totalDeepWells = 1.0
     };
 
     Moves moves = solveForMovesToOptimalTetrimino(state.getGrid(), state.getCurrentTetrimino(), state.getNextTetrimino(), weights);

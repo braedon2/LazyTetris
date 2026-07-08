@@ -3,6 +3,7 @@
 
 #include <array>
 #include <map>
+#include <random>
 #include <vector>
 #include "constants.h"
 #include "raylib.h"
@@ -19,7 +20,7 @@ enum Direction { down, right, left };
 
 /// used as a key to map a tetromino shape to data that relates to it. N is used as a null shape
 enum TetriminoShape { I, J, L, O, S, T, Z, N };
-const int numTetriminoShapes = 6; // exludes the N shape because it's null and not an actual shape
+const int numTetriminoShapes = 7; // exludes the N shape because it's null and not an actual shape
 
 /// There are three sprite variants for each level
 /// A GridCell instance stores a spriteType instead of the sprite itself.
@@ -214,6 +215,9 @@ class GameState {
     bool isCurrentTetriminoPlaced = false;
     std::vector<int> linesToClear;
     int lineClearStep = 0; 
+
+    std::mt19937_64 randomEngine;
+    std::uniform_int_distribution<int> dist;
 
     public:
     GameGrid grid;

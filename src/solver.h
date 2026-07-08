@@ -9,6 +9,8 @@
 #include "constants.h"
 #include "tetris.h"
 
+#define NUM_FACTORS 7
+
 struct GraphNode; 
 
 /* 
@@ -33,13 +35,6 @@ struct GraphNode;
     std::array<GraphNode*, 4>::const_iterator end() const {return this->arr.begin() + this->size;};
 };
 
- //class Graph {
- //public:
- //    std::vector<GraphNode> graph{ GRID_FRAME_HEIGHT * GRID_WIDTH * 4 };
- //    GraphNode at(size_t row, size_t col, size_t rotation) { return graph[(row * GRID_WIDTH * 4) + (col * 4) + rotation]; }
- //    void set(size_t row, size_t col, size_t rotation, GraphNode node) { graph[(row * GRID_WIDTH * 4) + (col * 4) + rotation] = node; }
- //};
-
 struct GraphNode {
     Tetrimino tetrimino;
     bool visited = false;
@@ -54,6 +49,7 @@ struct EvaluationFactors {
     int totalColumnHoles = 0;
     int totalColumnTransistions = 0;
     int totalRowTransitions = 0;
+    int totalDeepWells = 0;
 };
 
 struct EvaluationWeights {
@@ -63,6 +59,7 @@ struct EvaluationWeights {
     double totalColumnHoles;
     double totalColumnTransitions;
     double totalRowTransitions;
+    double totalDeepWells;
 };
 
 typedef std::array<std::array<std::array<GraphNode, 4>, GRID_WIDTH>, GRID_HEIGHT> Graph; // first dimension is row second dimension is column third dimension is rotation

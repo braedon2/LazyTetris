@@ -91,7 +91,8 @@ target_include_directories(lazy PUBLIC "${raylib_SOURCE_DIR}/src")
 add_executable(
   particle_swarm
   src/particle_swarm.cpp
-  src/particle_swarm.h
+  src/solver.cpp
+  src/tetris.cpp
 )
 
 target_link_libraries(

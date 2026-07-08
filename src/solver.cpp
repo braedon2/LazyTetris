@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cmath>
 #include <queue>
 #include <vector>
 #include "constants.h"
@@ -121,6 +122,8 @@ void computeEvaluationFactors(GameGrid grid, EvaluationFactors& factors) {
     // at the bottom and surrounded by walls on both sides. The possibility of intermittent gaps in
     //  the well walls means that well cells do not necessarily appear in a contiguous stack within a column.
     for (int col = 0; col < GRID_WIDTH; col++) {
+        int wellCellsInRow = 0;
+
         for (int row = 1; row < GRID_HEIGHT; row++) {
             if (not grid.isEmpty(col, row)) {
                 break;
@@ -129,14 +132,21 @@ void computeEvaluationFactors(GameGrid grid, EvaluationFactors& factors) {
             if (col == 0) {
                 if (not grid.isEmpty(col+1, row)) {
                     factors.totalWellCells++;
+                    wellCellsInRow += 1;
                 }
             } else if (col == GRID_WIDTH-1) {
                 if (not grid.isEmpty(col-1, row)) {
                     factors.totalWellCells++;
+                    wellCellsInRow += 1;
                 }
             } else if (not grid.isEmpty(col-1, row) and not grid.isEmpty(col+1, row)) {
                 factors.totalWellCells++;
+                wellCellsInRow += 1;
             }
+        }
+
+        if (wellCellsInRow >= 3) {
+            factors.totalDeepWells += 1;
         }
     }
 
@@ -209,9 +219,11 @@ double computeFitness(EvaluationFactors factors, EvaluationWeights weights) {
         factors.totalWellCells * weights.totalWellCells + 
         factors.totalColumnHoles * weights.totalColumnHoles + 
         factors.totalColumnTransistions * weights.totalColumnTransitions + 
-        factors.totalRowTransitions * weights.totalRowTransitions
+        factors.totalRowTransitions * weights.totalRowTransitions + 
+        factors.totalDeepWells * weights.totalDeepWells
     );
 }
+
 
 GraphNode* solve(Graph* firstTetriminoGraph, GameGrid& grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino, EvaluationWeights weights) {
     GraphNode* bestResult = nullptr;

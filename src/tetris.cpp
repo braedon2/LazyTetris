@@ -213,6 +213,10 @@ GameState::GameState() {
 
     this->nextTetrimino = Tetrimino(static_cast<TetriminoShape>(rand() % numTetriminoShapes));
     this->nextTetrimino.xDelta = SPAWN_X_DELTA;
+
+    std::random_device rd;
+    this->randomEngine = std::mt19937_64(rd());
+    this->dist = std::uniform_int_distribution<int>(0, numTetriminoShapes - 1);
 }
 
 GameGrid GameState::getGrid() { return this->grid; }
@@ -223,7 +227,7 @@ bool GameState::isCurrentTetrominoPlaced() { return this->isCurrentTetriminoPlac
 void GameState::initNewTetrimino() { 
     this->currentTetrimino = this->nextTetrimino;
 
-    this->nextTetrimino = Tetrimino(static_cast<TetriminoShape>(rand() % numTetriminoShapes)); 
+    this->nextTetrimino = Tetrimino(static_cast<TetriminoShape>(this->dist(this->randomEngine))); 
     this->nextTetrimino.xDelta = SPAWN_X_DELTA;
     this->isCurrentTetriminoPlaced = false;
 
