@@ -212,7 +212,7 @@ void computeEvaluationFactors(GameGrid grid, EvaluationFactors& factors) {
 }
 
 
-double computeFitness(EvaluationFactors factors, EvaluationWeights weights) {
+double computeFitness(EvaluationFactors factors, EvaluationWeights weights, bool ignoreDeepWells) {
     return (
         factors.totalLinesCleared * weights.totalLinesCleared +
         factors.totalLockHeight * weights.totalLockHeight +
@@ -220,8 +220,25 @@ double computeFitness(EvaluationFactors factors, EvaluationWeights weights) {
         factors.totalColumnHoles * weights.totalColumnHoles + 
         factors.totalColumnTransistions * weights.totalColumnTransitions + 
         factors.totalRowTransitions * weights.totalRowTransitions + 
-        factors.totalDeepWells * weights.totalDeepWells
+        factors.totalDeepWells * (ignoreDeepWells ? 0 : weights.totalDeepWells)
     );
+}
+
+
+int computePileHeight(GameGrid& grid) {
+    // height of the highest solid square
+    int height = 0; // arbitrary big number
+
+    for (int col = 0; col < GRID_WIDTH; col++) {
+        for (int row = 0; row < GRID_HEIGHT; row++) {
+            if (not grid.isEmpty(col, row)) {
+                if (GRID_HEIGHT - 1 - row > height) {
+                    height = GRID_HEIGHT - 1 - row;
+                }
+            }
+        }
+    }
+    return height;
 }
 
 
@@ -234,8 +251,9 @@ GraphNode* solve(Graph* firstTetriminoGraph, GameGrid& grid, Tetrimino firstTetr
         computeEvaluationFactors(grid, factors);
         factors.totalLinesCleared = linesCleared;
         factors.totalLockHeight = totalLockHeight;
+        bool ignoreDeepWells = computePileHeight(grid) > 12;
 
-        double fitness = computeFitness(factors, weights);
+        double fitness = computeFitness(factors, weights, ignoreDeepWells);
 
         if (bestFitness < 0 or fitness < bestFitness) {
             bestFitness = fitness;
@@ -243,7 +261,11 @@ GraphNode* solve(Graph* firstTetriminoGraph, GameGrid& grid, Tetrimino firstTetr
         }
     };
 
-    GraphNode* defaultResult = analyzeAllCombinations(analyze, firstTetriminoGraph, grid, firstTetrimino, secondTetrimino);
+    auto onTetrisFound = [&bestResult](GraphNode* tetriminoPlacement) {
+        bestResult = tetriminoPlacement;
+    };
+
+    GraphNode* defaultResult = analyzeAllCombinations(analyze, onTetrisFound, firstTetriminoGraph, grid, firstTetrimino, secondTetrimino);
 
     return bestResult ? bestResult : defaultResult;
 }

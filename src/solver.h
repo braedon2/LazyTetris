@@ -71,7 +71,8 @@ std::unique_ptr<Graph> makeGraph(Tetrimino& tetrimino, GameGrid& grid);
 std::vector<GraphNode*> search(Graph* graph, Tetrimino& tetrimino, GameGrid& grid);
 Moves movesToReachSearchResult(GraphNode* searchResult);
 void computeEvaluationFactors(GameGrid grid, EvaluationFactors& factors);
-double computeFitness(EvaluationFactors factors, EvaluationWeights weights);
+double computeFitness(EvaluationFactors factors, EvaluationWeights weights, bool ignoreDeepWells);
+int computePileHeight(GameGrid& grid);
 
 GraphNode* solve(
     Graph* firstTetriminoGraph,
@@ -83,8 +84,8 @@ GraphNode* solve(
 Moves solveForMovesToOptimalTetrimino(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino, EvaluationWeights weights);
 Tetrimino solveForOptimalTetrimino(GameGrid grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino, EvaluationWeights weights);
 
-template <typename Func>
-GraphNode* analyzeAllCombinations(Func analyze, Graph* firstTetriminoGraph, GameGrid& grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) {
+template <typename Func1, typename Func2>
+GraphNode* analyzeAllCombinations(Func1 analyze, Func2 onTetrisFound, Graph* firstTetriminoGraph, GameGrid& grid, Tetrimino firstTetrimino, Tetrimino secondTetrimino) {
     std::vector<GraphNode*> firstResults = search(firstTetriminoGraph, firstTetrimino, grid);
 
     for (GraphNode* firstResult : firstResults) {
@@ -94,7 +95,8 @@ GraphNode* analyzeAllCombinations(Func analyze, Graph* firstTetriminoGraph, Game
 
         GameGrid gridCopy = grid;
         gridCopy.setCells(firstResult->tetrimino);
-        int linesCleared = static_cast<int>(gridCopy.getFullRows().size());
+        int firstPieceLinesCleared = static_cast<int>(gridCopy.getFullRows().size());
+        bool tetrisFound = firstPieceLinesCleared == 4;
         gridCopy.clearFullRows();
 
         auto secondGraph = makeGraph(secondTetrimino, gridCopy);
@@ -107,10 +109,29 @@ GraphNode* analyzeAllCombinations(Func analyze, Graph* firstTetriminoGraph, Game
 
             GameGrid secondGridCopy = gridCopy;
             secondGridCopy.setCells(secondResult->tetrimino);
-            linesCleared += static_cast<int>(gridCopy.getFullRows().size());
+            int secondPieceLinesCleared = static_cast<int>(gridCopy.getFullRows().size());
+            tetrisFound = tetrisFound or secondPieceLinesCleared == 4;
             secondGridCopy.clearFullRows();
 
-            analyze(secondGridCopy, firstTetrimino.getHeight() + secondTetrimino.getHeight(), linesCleared, firstResult);
+            if (tetrisFound) {
+                onTetrisFound(firstResult);
+            }
+            else {
+                analyze(
+                    secondGridCopy, 
+                    firstTetrimino.getHeight() + secondTetrimino.getHeight(), 
+                    firstPieceLinesCleared + secondPieceLinesCleared, 
+                    firstResult);
+            }
+            
+            // stop analyzing combinations if either piece of this combination results in a tetris
+            if (tetrisFound) {
+                break;
+            }
+        }
+
+        if (tetrisFound) {
+            break;
         }
     }
 

@@ -22,13 +22,13 @@ int main(void) {
     FrameDrawer frameDrawer;
 
     EvaluationWeights weights = {
-        .totalLinesCleared = 1.0,
-        .totalLockHeight = 12.885008263218383,
-        .totalWellCells = 15.842707182438396,
-        .totalColumnHoles = 26.894496507795950,
-        .totalColumnTransitions = 27.616914062397015,
-        .totalRowTransitions = 30.185110719279040,
-        .totalDeepWells = 1.0
+        .totalLinesCleared = 1.67348,
+        .totalLockHeight = 4.34036,
+        .totalWellCells = -4.774,
+        .totalColumnHoles = 11.6506,
+        .totalColumnTransitions = 9.23035,
+        .totalRowTransitions = 8.49966,
+        .totalDeepWells = -23.6849
     };
 
     Moves moves = solveForMovesToOptimalTetrimino(state.getGrid(), state.getCurrentTetrimino(), state.getNextTetrimino(), weights);

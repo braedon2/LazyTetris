@@ -180,7 +180,11 @@ TEST(SolverTest, AnalyzeAllCombinations) {
         std::cout << "x: " << result->tetrimino.xDelta << std::endl;
     };
 
-    analyzeAllCombinations(analyze, firstGraph.get(), grid, firstTetrimino, secondTetrimino);
+    auto onTetrisFound = [](GraphNode* tetriminoPlacement) {
+        std::cout << "tetris found" << std::endl;
+    };
+
+    analyzeAllCombinations(analyze, onTetrisFound, firstGraph.get(), grid, firstTetrimino, secondTetrimino);
 }
 
 TEST(SolverTest, EvaluateAllFactors) {
